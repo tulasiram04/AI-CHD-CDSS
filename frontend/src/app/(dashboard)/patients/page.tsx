@@ -426,7 +426,7 @@ export default function PatientsRegistry() {
         )}
       </GlassCard>
 
-      {/* ── Patient Registration Modal Overlay ── */}
+      {/* -- Patient Registration Modal Overlay -- */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-white/95 rounded-2xl border border-[#B3D4FF] shadow-2xl max-w-xl w-full p-6 space-y-4 animate-fade-in my-8 max-h-[90vh] overflow-y-auto">

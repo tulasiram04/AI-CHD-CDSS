@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
 import { useToast } from "@/providers/ToastProvider";
 
-/* ─── Animated ECG Line ─────────────────────────────────────────────────── */
+/* --- Animated ECG Line --------------------------------------------------- */
 function AnimatedECG({
   color = "#3b82f6",
   opacity = 0.18,
@@ -58,7 +58,7 @@ function AnimatedECG({
   );
 }
 
-/* ─── Floating Particle ─────────────────────────────────────────────────── */
+/* --- Floating Particle --------------------------------------------------- */
 function FloatingParticle({
   x,
   y,
@@ -92,7 +92,7 @@ function FloatingParticle({
   );
 }
 
-/* ─── Animated Heart ────────────────────────────────────────────────────── */
+/* --- Animated Heart ------------------------------------------------------ */
 function AnimatedHeart({
   style: extraStyle,
   size = 120,
@@ -154,7 +154,7 @@ function AnimatedHeart({
   );
 }
 
-/* ─── Main Login Page ───────────────────────────────────────────────────── */
+/* --- Main Login Page ----------------------------------------------------- */
 export default function LoginPage() {
   const router = useRouter();
   const { login, user, isLoading } = useAuth();
@@ -251,7 +251,7 @@ export default function LoginPage() {
 
   return (
     <>
-      {/* ─── Keyframe Styles ─────────────────────────────────────────── */}
+      {/* --- Keyframe Styles ------------------------------------------- */}
       <style>{`
         @keyframes ecgScroll {
           from { transform: translateX(0); }
@@ -308,7 +308,7 @@ export default function LoginPage() {
         .request-btn { transition: all 0.18s ease; }
       `}</style>
 
-      {/* ─── Page Root ────────────────────────────────────────────────── */}
+      {/* --- Page Root -------------------------------------------------- */}
       <div
         style={{
           width: "100vw",
@@ -322,19 +322,19 @@ export default function LoginPage() {
           animation: "bgShift 14s ease infinite",
         }}
       >
-        {/* ── Floating Particles ─────────────────────────────────────── */}
+        {/* -- Floating Particles --------------------------------------- */}
         {particles.map((p, i) => (
           <FloatingParticle key={i} {...p} />
         ))}
 
-        {/* ── ECG Lines ──────────────────────────────────────────────── */}
+        {/* -- ECG Lines ------------------------------------------------ */}
         <AnimatedECG top="10%"  opacity={0.13} duration={7}  delay={0}   color="#3b82f6" />
         <AnimatedECG top="28%"  opacity={0.09} duration={10} delay={1.5} color="#ef4444" />
         <AnimatedECG top="50%"  opacity={0.08} duration={8}  delay={0.8} color="#3b82f6" />
         <AnimatedECG top="72%"  opacity={0.10} duration={9}  delay={2}   color="#ef4444" />
         <AnimatedECG bottom="8%" opacity={0.13} duration={7}  delay={0.4} color="#3b82f6" />
 
-        {/* ── Large background hearts ────────────────────────────────── */}
+        {/* -- Large background hearts ---------------------------------- */}
         <AnimatedHeart
           size={280}
           pulseDelay={0}
@@ -351,7 +351,7 @@ export default function LoginPage() {
           style={{ top: "38%", left: "43%", opacity: 0.06 }}
         />
 
-        {/* ── Decorative crosses ─────────────────────────────────────── */}
+        {/* -- Decorative crosses --------------------------------------- */}
         {[
           { top: 40,  right: 140, size: 22, opacity: 0.14 },
           { top: 200, left:  80,  size: 18, opacity: 0.10 },
@@ -371,7 +371,7 @@ export default function LoginPage() {
           </svg>
         ))}
 
-        {/* ── Spinning ring accent ───────────────────────────────────── */}
+        {/* -- Spinning ring accent ------------------------------------- */}
         <div
           style={{
             position: "absolute",
@@ -800,7 +800,7 @@ export default function LoginPage() {
             zIndex: 10,
           }}
         >
-          {/* ── Animated heart (main decoration) ──────────────────────── */}
+          {/* -- Animated heart (main decoration) ------------------------ */}
           <div
             style={{
               position: "absolute",

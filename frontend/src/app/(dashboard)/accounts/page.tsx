@@ -220,7 +220,7 @@ export default function RegisteredAccountsPage() {
         )}
       </GlassCard>
 
-      {/* ─── Message Dialog Overlay ─── */}
+      {/* --- Message Dialog Overlay --- */}
       {messageTargetUser && (
         <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
           <div className="bg-white/95 backdrop-blur-md border border-slate-200/60 p-6 rounded-2xl w-96 shadow-2xl shadow-slate-900/10 space-y-4 text-left">

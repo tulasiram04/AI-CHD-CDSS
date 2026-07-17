@@ -32,7 +32,7 @@ export default function Topbar() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // ─── Live Date (updates every minute) ────────────────────────────────────
+  // --- Live Date (updates every minute) ------------------------------------
   const [now, setNow] = useState(new Date());
   useEffect(() => {
     setNow(new Date());
@@ -44,7 +44,7 @@ export default function Topbar() {
     weekday: "short", year: "numeric", month: "short", day: "numeric"
   });
 
-  // ─── Search ───────────────────────────────────────────────────────────────
+  // --- Search ---------------------------------------------------------------
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<PatientResult[]>([]);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -98,18 +98,18 @@ export default function Topbar() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // ─── Notifications ────────────────────────────────────────────────────────
+  // --- Notifications --------------------------------------------------------
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
 
-  // ─── Rejection reason modal state ─────────────────────────────────────────
+  // --- Rejection reason modal state -----------------------------------------
   const [rejectTargetId, setRejectTargetId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [infoTargetId, setInfoTargetId] = useState<string | null>(null);
   const [infoNote, setInfoNote] = useState("");
   const [activeTab, setActiveTab] = useState<"notifications" | "requests">("notifications");
   
-  // ─── Reply state ──────────────────────────────────────────────────────────
+  // --- Reply state ----------------------------------------------------------
   const [replyTargetNotifId, setReplyTargetNotifId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
 
@@ -157,7 +157,7 @@ export default function Topbar() {
     },
   });
 
-  // ─── Pending Registration Requests (Doctors only) ─────────────────────────
+  // --- Pending Registration Requests (Doctors only) -------------------------
   const { data: pendingRequests = [] } = useQuery<any[]>({
     queryKey: ["pendingRequests"],
     queryFn: async () => {
@@ -220,7 +220,7 @@ export default function Topbar() {
   return (
     <header className="glass-panel border-b border-slate-200/40 px-6 py-4 flex items-center justify-between sticky top-0 z-30">
 
-      {/* ─── Global Search ──────────────────────────────── */}
+      {/* --- Global Search -------------------------------- */}
       <div className="relative w-80" ref={searchRef}>
         <input
           type="text"
@@ -283,7 +283,7 @@ export default function Topbar() {
         )}
       </div>
 
-      {/* ─── Right Section ──────────────────────────────── */}
+      {/* --- Right Section -------------------------------- */}
       <div className="flex items-center gap-4">
 
         {/* Live Date & Ward */}
@@ -292,7 +292,7 @@ export default function Topbar() {
           <span className="text-[9px] font-bold text-primary uppercase tracking-wider">CCU Ward • Hospital</span>
         </div>
 
-        {/* ─── Notification Bell ─── */}
+        {/* --- Notification Bell --- */}
         <div className="relative" ref={notifRef}>
           <button
             onClick={() => setNotifOpen((o) => !o)}
@@ -610,7 +610,7 @@ export default function Topbar() {
           <span>Quick Prediction</span>
         </GlassButton>
 
-        {/* ─── Profile Avatar (redirects to /settings) ─── */}
+        {/* --- Profile Avatar (redirects to /settings) --- */}
         {user && (
           <div className="flex items-center gap-2 pl-2 border-l border-slate-200/50">
             <button

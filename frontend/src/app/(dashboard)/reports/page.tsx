@@ -21,7 +21,7 @@ import {
 } from "@/lib/pdfGenerator";
 
 
-/* ─── Types ─────────────────────────────────────────────────────────── */
+/* --- Types ----------------------------------------------------------- */
 type ReportStatus = "Ready" | "Generating" | "Completed" | "Archived" | "Failed";
 
 interface ReportRecord {
@@ -45,7 +45,7 @@ interface ActivityItem {
   icon: "generated" | "downloaded" | "printed" | "exported";
 }
 
-/* ─── Status Badge ───────────────────────────────────────────────────── */
+/* --- Status Badge ----------------------------------------------------- */
 function StatusPill({ status }: { status: ReportStatus }) {
   const map: Record<ReportStatus, string> = {
     Ready: "bg-emerald-50 text-emerald-700 border border-emerald-200",
@@ -66,7 +66,7 @@ function StatusPill({ status }: { status: ReportStatus }) {
   );
 }
 
-/* ─── Skeleton Loader ────────────────────────────────────────────────── */
+/* --- Skeleton Loader -------------------------------------------------- */
 function SkeletonRow() {
   return (
     <tr className="border-b border-slate-100/60">
@@ -79,7 +79,7 @@ function SkeletonRow() {
   );
 }
 
-/* ─── Summary Card ───────────────────────────────────────────────────── */
+/* --- Summary Card ----------------------------------------------------- */
 function SummaryCard({ title, value, desc, accent, icon: Icon }: { title: string; value: string | number; desc: string; accent: string; icon: React.ElementType }) {
   return (
     <motion.div whileHover={{ y: -3 }} transition={{ type: "spring", stiffness: 300, damping: 20 }}>
@@ -100,7 +100,7 @@ function SummaryCard({ title, value, desc, accent, icon: Icon }: { title: string
   );
 }
 
-/* ─── Category Card ──────────────────────────────────────────────────── */
+/* --- Category Card ---------------------------------------------------- */
 function CategoryCard({ icon: Icon, title, description, items, count, color, onView }: {
   icon: React.ElementType; title: string; description: string; items: string[]; count: number; color: string; onView: () => void;
 }) {
@@ -136,7 +136,7 @@ function CategoryCard({ icon: Icon, title, description, items, count, color, onV
   );
 }
 
-/* ─── DB Report type (from backend) ─────────────────────────────────── */
+/* --- DB Report type (from backend) ----------------------------------- */
 interface DbReport {
   id: string;
   name: string;
@@ -153,7 +153,7 @@ interface DbReport {
   updated_at: string;
 }
 
-/* ─── Main Component ──────────────────────────────────────────────────── */
+/* --- Main Component ---------------------------------------------------- */
 export default function ReportsCenter() {
   const { toast } = useToast();
   const { user } = useAuth();
@@ -167,7 +167,7 @@ export default function ReportsCenter() {
   const [previewReport, setPreviewReport] = useState<ReportRecord | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  /* ─── Backend Data ──────────────────────────────────────────────── */
+  /* --- Backend Data ------------------------------------------------ */
   const { data: patients } = useQuery({
     queryKey: ["patients"],
     queryFn: async () => {
@@ -202,7 +202,7 @@ export default function ReportsCenter() {
     },
   });
 
-  /* ─── Real Reports from DB ──────────────────────────────────────── */
+  /* --- Real Reports from DB ---------------------------------------- */
   const { data: dbReports = [], isLoading: reportsLoading } = useQuery<DbReport[]>({
     queryKey: ["reports"],
     queryFn: async () => {
@@ -211,7 +211,7 @@ export default function ReportsCenter() {
     },
   });
 
-  /* ─── Mutations ─────────────────────────────────────────────────── */
+  /* --- Mutations --------------------------------------------------- */
   const createReportMutation = useMutation({
     mutationFn: async (payload: {
       name: string;
@@ -258,7 +258,7 @@ export default function ReportsCenter() {
     },
   });
 
-  /* ─── Derived Stats ─────────────────────────────────────────────── */
+  /* --- Derived Stats ----------------------------------------------- */
   const latestAudit = useMemo(() => {
     if (!audits) return null;
     return audits.filter((a: any) => a.model_version !== "mock-1")[0];
@@ -286,7 +286,7 @@ export default function ReportsCenter() {
     }).length;
   }, [audits]);
 
-  /* ─── Map DB reports → ReportRecord for display ─────────────────── */
+  /* --- Map DB reports → ReportRecord for display ------------------- */
   const allReports: ReportRecord[] = useMemo(() => {
     return dbReports.map((r) => ({
       id: r.id,
@@ -302,7 +302,7 @@ export default function ReportsCenter() {
     }));
   }, [dbReports, user]);
 
-  /* ─── Filtered + Sorted Reports ────────────────────────────────── */
+  /* --- Filtered + Sorted Reports ---------------------------------- */
   const displayedReports = useMemo(() => {
     let list = [...allReports];
     if (activeCategory) list = list.filter((r) => r.category === activeCategory);
@@ -327,7 +327,7 @@ export default function ReportsCenter() {
     return list;
   }, [allReports, search, filterType, filterStatus, sortOrder, activeCategory]);
 
-  /* ─── Activity Feed (derived from real DB reports) ─────────────── */
+  /* --- Activity Feed (derived from real DB reports) --------------- */
   const activities: ActivityItem[] = useMemo(() => {
     const feed: ActivityItem[] = [];
     dbReports.slice(0, 4).forEach((r, i) => {
@@ -345,7 +345,7 @@ export default function ReportsCenter() {
     return feed;
   }, [dbReports, latestAudit]);
 
-  /* ─── Actions ───────────────────────────────────────────────────── */
+  /* --- Actions ----------------------------------------------------- */
   const handlePrint = (name: string) => { window.print(); toast(`Print launched for: ${name}`, "success", "Printing"); };
 
   const handleDownload = async (report: ReportRecord) => {
@@ -378,7 +378,7 @@ export default function ReportsCenter() {
     pinMutation.mutate(id);
   };
 
-  /* ─── Generate Options ─────────────────────────────────────────── */
+  /* --- Generate Options ------------------------------------------- */
   const generateOptions = [
     { id: "chd",     label: "Patient CHD Report",   icon: Activity,      color: "text-rose-500 bg-rose-50 border-rose-100",     report_type: "Clinical Chart",       category: "patient"    },
     { id: "pred",    label: "Prediction Summary",    icon: Brain,         color: "text-purple-500 bg-purple-50 border-purple-100", report_type: "Prediction Report",    category: "prediction" },
@@ -388,7 +388,7 @@ export default function ReportsCenter() {
     { id: "stats",   label: "Hospital Statistics",   icon: BarChart3,     color: "text-indigo-500 bg-indigo-50 border-indigo-100", report_type: "Cohort Analysis",     category: "clinical"   },
   ];
 
-  /* ─── Categories ─────────────────────────────────────────────────── */
+  /* --- Categories --------------------------------------------------- */
   const categories = [
     {
       id: "patient", icon: Users, title: "Patient Reports", color: "bg-blue-50 border-blue-100 text-blue-600",
@@ -423,10 +423,10 @@ export default function ReportsCenter() {
     exported: <Share2 className="h-3.5 w-3.5 text-purple-500" />,
   };
 
-  /* ─── Render ──────────────────────────────────────────────────────── */
+  /* --- Render -------------------------------------------------------- */
   return (
     <div className="space-y-6">
-      {/* ── Page Header ───────────────────────────────────────────── */}
+      {/* -- Page Header --------------------------------------------- */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-2">
@@ -448,7 +448,7 @@ export default function ReportsCenter() {
         </motion.button>
       </div>
 
-      {/* ── Summary Cards ─────────────────────────────────────────── */}
+      {/* -- Summary Cards ------------------------------------------- */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <SummaryCard title="Total Reports" value={allReports.length} desc="Saved in database" accent="bg-slate-700" icon={FolderOpen} />
         <SummaryCard title="Generated Today" value={dbReports.filter(r => new Date(r.created_at).toDateString() === new Date().toDateString()).length} desc="Reports this session" accent="bg-emerald-500" icon={CalendarDays} />
@@ -456,7 +456,7 @@ export default function ReportsCenter() {
         <SummaryCard title="Pinned Reports" value={allReports.filter(r => r.pinned).length} desc="Starred for quick access" accent="bg-blue-500" icon={Star} />
       </div>
 
-      {/* ── Toolbar ───────────────────────────────────────────────── */}
+      {/* -- Toolbar ------------------------------------------------- */}
       <GlassCard className="p-4 bg-white/80">
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
           {/* Search */}
@@ -525,7 +525,7 @@ export default function ReportsCenter() {
         </div>
       </GlassCard>
 
-      {/* ── Report Categories ──────────────────────────────────────── */}
+      {/* -- Report Categories ---------------------------------------- */}
       <div>
         <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Report Categories</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -539,7 +539,7 @@ export default function ReportsCenter() {
         </div>
       </div>
 
-      {/* ── Reports Table + Activity Feed ─────────────────────────── */}
+      {/* -- Reports Table + Activity Feed --------------------------- */}
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
         {/* Table */}
         <div className="xl:col-span-3 space-y-3">
@@ -735,7 +735,7 @@ export default function ReportsCenter() {
         </div>
       </div>
 
-      {/* ── Download History ───────────────────────────────────────── */}
+      {/* -- Download History ----------------------------------------- */}
       <div>
         <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Recently Downloaded</h3>
         <GlassCard className="p-4 bg-white/80">
