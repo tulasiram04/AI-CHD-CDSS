@@ -1,0 +1,74 @@
+##############################################################################
+# render.yaml — AI-CHD-CDSS Render Deployment (Free Tier)
+# Services: PostgreSQL (free) + Backend FastAPI (free) + Frontend Next.js (free)
+##############################################################################
+
+databases:
+  - name: chd-postgres
+    databaseName: chd_cdss
+    user: chd_user
+    plan: free
+    region: oregon
+
+services:
+  # ─────────────────────────────────────────────────────────
+  # 1. FastAPI Backend (Web Service — Docker)
+  # ─────────────────────────────────────────────────────────
+  - type: web
+    name: chd-backend
+    plan: free
+    region: oregon
+    runtime: docker
+    dockerfilePath: ./docker/Dockerfile.backend
+    dockerContext: .
+    buildCommand: ""
+    startCommand: ""
+    healthCheckPath: /health
+    envVars:
+      - key: ENV
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: PROJECT_NAME
+        value: AI-CHD-CDSS
+      - key: DATABASE_URL
+        fromDatabase:
+          name: chd-postgres
+          property: connectionString
+      - key: REDIS_URL
+        value: redis://localhost:6379/0   # placeholder — update after deploy
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "60"
+      - key: RATE_LIMIT_PER_MINUTE
+        value: "100"
+      - key: ALLOWED_ORIGINS
+        value: "https://chd-frontend.onrender.com,http://localhost:3000"
+      - key: MIMIC_DATA_PATH
+        value: /app/data/mimic
+      - key: PROCESSED_DATA_PATH
+        value: /app/etl/processed_chd_dataset/processed_20260714_v1.csv
+
+  # ─────────────────────────────────────────────────────────
+  # 2. Next.js Frontend (Web Service — Node)
+  # ─────────────────────────────────────────────────────────
+  - type: web
+    name: chd-frontend
+    plan: free
+    region: oregon
+    runtime: node
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        value: https://chd-backend.onrender.com
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"
+      - key: PORT
+        value: "3000"

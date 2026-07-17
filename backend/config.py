@@ -10,11 +10,13 @@ class Settings(BaseSettings):
         extra="ignore"
     )
 
-    ENV: str = "development"
-    DEBUG: bool = True
+    ENV: str = "production"
+    DEBUG: bool = False
     PROJECT_NAME: str = "AI-CHD-CDSS"
 
     # PostgreSQL Configuration
+    # Render injects DATABASE_URL automatically for managed Postgres.
+    # Fallback to individual parts for local development.
     POSTGRES_USER: str = "postgres"
     POSTGRES_PASSWORD: str = "postgres_chd_secure_pwd"
     POSTGRES_DB: str = "chd_cdss"
@@ -22,7 +24,7 @@ class Settings(BaseSettings):
     POSTGRES_PORT: int = 5432
     DATABASE_URL: str = "postgresql://postgres:postgres_chd_secure_pwd@localhost:5432/chd_cdss"
 
-    # Redis Configuration
+    # Redis Configuration (optional on free tier — Celery tasks will be skipped)
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379
     REDIS_URL: str = "redis://localhost:6379/0"
@@ -36,11 +38,15 @@ class Settings(BaseSettings):
     RATE_LIMIT_PER_MINUTE: int = 100
 
     # MIMIC Dataset Paths
-    MIMIC_DATA_PATH: str = "d:/mimic-iv-clinical-database-demo-2.2/mimic-iv-clinical-database-demo-2.2"
-    PROCESSED_DATA_PATH: str = "d:/Bio-Tech Project/etl/processed_chd_data.csv"
+    MIMIC_DATA_PATH: str = "/app/data/mimic"
+    PROCESSED_DATA_PATH: str = "/app/etl/processed_chd_dataset/processed_20260714_v1.csv"
 
-    # CORS Configuration
-    ALLOWED_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
+    # CORS Configuration — include Render URLs
+    ALLOWED_ORIGINS: str = (
+        "https://chd-frontend.onrender.com,"
+        "http://localhost:3000,"
+        "http://127.0.0.1:3000"
+    )
 
     @property
     def cors_origins(self) -> List[str]:

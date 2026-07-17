@@ -64,6 +64,9 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.next/
+frontend/.env.local
+frontend/tsconfig.tsbuildinfo
 
 # Large data directories
 mimic-iv-clinical-database-2.2/
