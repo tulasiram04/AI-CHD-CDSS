@@ -1,0 +1,60 @@
+# Machine Learning Infrastructure Configuration
+
+meta:
+  project_name: "AI-CHD-CDSS"
+  random_seed: 42
+
+splitting:
+  train_ratio: 0.70
+  validation_ratio: 0.15
+  test_ratio: 0.15
+  stratify_by: "target"
+  split_by_patient: true
+
+preprocessing:
+  numerical_scaler: "standard" # standard, minmax, robust
+  categorical_encoder: "onehot" # onehot, ordinal
+  impute_strategy_numerical: "median"
+  add_missing_indicator: true
+
+feature_selection:
+  variance_threshold: 0.01
+  correlation_threshold: 0.85
+  rfe_features_to_select: 15
+
+evaluation:
+  metrics:
+    - "accuracy"
+    - "precision"
+    - "recall"
+    - "f1"
+    - "roc_auc"
+    - "pr_auc"
+    - "specificity"
+    - "sensitivity"
+    - "balanced_accuracy"
+    - "mcc"
+    - "brier_score"
+  calibration:
+    method: "isotonic" # platt, isotonic
+    bins: 10
+  fairness:
+    protected_attributes:
+      - "gender"
+      - "age_bucket"
+    metrics:
+      - "equal_opportunity"
+      - "demographic_parity"
+      - "calibration_parity"
+      - "false_positive_rate"
+
+mlflow:
+  experiment_name: "CHD_Predictive_CDSS"
+  tracking_uri: "http://localhost:5000"
+  registry_name: "CHD_Coronary_Heart_Disease_Risk_Model"
+  model_stages:
+    - "Staging"
+    - "Validation"
+    - "Clinically Approved"
+    - "Production"
+    - "Retired"

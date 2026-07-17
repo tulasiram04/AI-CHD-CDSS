@@ -1,0 +1,16 @@
+{
+    "model_name": "XGBoost",
+    "version": "4",
+    "mlflow_run_id": "e449f9d382194d0cb1dd837edb855159",
+    "dataset_version": "20260714_v1",
+    "dataset_checksum": "6c9e118e245abe61075317face8be98bfe2091c684bebcf78cf7e3b759ba2322",
+    "training_date": "2026-07-14",
+    "calibration_method": "isotonic",
+    "brier_scores_calibration": {
+        "uncalibrated": 0.19143121753292033,
+        "platt": 0.18426204715511194,
+        "isotonic": 0.14266091051805335
+    },
+    "fairness_status": "Failed Thresholds",
+    "is_smoke_test_only": true
+}

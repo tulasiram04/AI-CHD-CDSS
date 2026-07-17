@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --color-background: #F7FBFF;
+  --color-secondary-bg: #E1F0FF;
+  --color-brand-light: #B3D4FF;
+  --color-primary: #8FB3D9;
+  --color-accent: #B3D4FF;
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+  --color-text-main: #4C6F87;
+  --color-text-muted: #8FA3D9;
+  --color-border-glass: rgba(179, 212, 255, 0.45);
+  
+  --shadow-glass: 0 8px 32px 0 rgba(143, 179, 217, 0.08), 0 1px 2px 0 rgba(0, 0, 0, 0.01);
+  --shadow-glass-hover: 0 12px 40px 0 rgba(143, 179, 217, 0.15), 0 4px 12px 0 rgba(0, 0, 0, 0.02);
+}
+
+:root {
+  --background: #F7FBFF;
+  --foreground: #4C6F87;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Custom Glassmorphism utility classes */
+.glass-panel {
+  background: rgba(225, 240, 255, 0.65);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(179, 212, 255, 0.45);
+  box-shadow: 0 8px 32px 0 rgba(143, 179, 217, 0.08);
+}
+
+.glass-panel-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-panel-hover:hover {
+  transform: translateY(-2px);
+  background: rgba(225, 240, 255, 0.78);
+  box-shadow: 0 12px 40px 0 rgba(143, 179, 217, 0.15);
+  border-color: rgba(179, 212, 255, 0.65);
+}
+
+/* Premium Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #B3D4FF;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8FB3D9;
+}
+
+/* Custom Animations */
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.ripple-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-effect .ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: ripple 600ms linear;
+  background-color: rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+}

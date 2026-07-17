@@ -1,0 +1,55 @@
+# ICD Code Mappings for Coronary Heart Disease and Comorbidities
+# Codes are matched using regular expressions against raw diagnoses_icd
+
+coronary_heart_disease:
+  name: "Coronary Heart Disease (Ischemic Heart Disease)"
+  icd9:
+    - "^410"  # Acute myocardial infarction
+    - "^411"  # Other acute and subacute forms of ischemic heart disease
+    - "^412"  # Old myocardial infarction
+    - "^413"  # Angina pectoris
+    - "^414"  # Other forms of chronic ischemic heart disease
+  icd10:
+    - "^I20"  # Angina pectoris
+    - "^I21"  # Acute myocardial infarction
+    - "^I22"  # Subsequent ST elevation (STEMI) and non-ST elevation (NSTEMI) myocardial infarction
+    - "^I23"  # Certain current complications following acute myocardial infarction
+    - "^I24"  # Other acute ischemic heart diseases
+    - "^I25"  # Chronic ischemic heart disease
+  icd11:
+    - "^BA4"  # Ischemic heart disease
+
+hypertension:
+  name: "Hypertension"
+  icd9:
+    - "^401"  # Essential hypertension
+    - "^402"  # Hypertensive heart disease
+    - "^403"  # Hypertensive renal disease
+    - "^404"  # Hypertensive heart and renal disease
+    - "^405"  # Secondary hypertension
+  icd10:
+    - "^I10"  # Essential (primary) hypertension
+    - "^I11"  # Hypertensive heart disease
+    - "^I12"  # Hypertensive renal disease
+    - "^I13"  # Hypertensive heart and renal disease
+    - "^I15"  # Secondary hypertension
+
+diabetes:
+  name: "Diabetes Mellitus"
+  icd9:
+    - "^250"  # Diabetes mellitus
+  icd10:
+    - "^E10"  # Type 1 diabetes mellitus
+    - "^E11"  # Type 2 diabetes mellitus
+    - "^E13"  # Other specified diabetes mellitus
+    - "^E14"  # Unspecified diabetes mellitus
+
+smoking_history:
+  name: "Tobacco Use Disorder / Smoking History"
+  icd9:
+    - "^3051"  # Tobacco use disorder
+    - "^V1582" # History of tobacco use
+  icd10:
+    - "^F17"  # Nicotine dependence
+    - "^Z720"  # Tobacco use
+    - "^Z87891" # Personal history of nicotine dependence

@@ -1,0 +1,3 @@
+subject_id,hadm_id,admittime,age,gender,bmi,bmi_missing,systolic_bp,diastolic_bp,bp_missing,glucose,glucose_missing,cholesterol,chol_missing,heart_rate,hr_missing,statin_history,beta_blocker_history,ace_arb_history,aspirin_history,medication_count,hypertension,diabetes,smoking,previous_cardiac,admission_frequency,target
+10012853,22539296,2176-06-06 18:09:00,89,0,4649.4,0,121.0,70.0,1,107.0,0,219.0,1,,1,1,1,1,1,4,1,1,0,0,1,0
+10012853,26369609,2175-04-05 15:36:00,89,0,4649.4,0,121.0,70.0,1,215.0,0,219.0,1,,1,0,0,0,0,0,0,0,0,0,0,0

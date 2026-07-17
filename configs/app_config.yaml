@@ -1,0 +1,73 @@
+# Enterprise App Config for AI-CHD-CDSS
+
+etl:
+  raw_data_dir: "D:/Bio-Tech Project/mimic-iv-clinical-database-2.2"
+  output_dir: "d:/Bio-Tech Project/etl/processed_chd_dataset"
+  log_dir: "d:/Bio-Tech Project/etl/logs"
+  quarantine_dir: "d:/Bio-Tech Project/etl/quarantine"
+  
+validation:
+  age:
+    min: 0
+    max: 120
+  bmi:
+    min: 10.0
+    max: 80.0
+  systolic_bp:
+    min: 50
+    max: 250
+  diastolic_bp:
+    min: 30
+    max: 150
+  glucose:
+    min: 20
+    max: 1000
+  heart_rate:
+    min: 30
+    max: 220
+  null_thresholds:
+    demographics: 0.0  # Zero nulls allowed in age/gender
+    vitals: 0.5        # Max 50% missing before record rejection
+    labs: 0.7          # Max 70% missing before record rejection
+
+imputation:
+  glucose:
+    strategy: "median"
+    group_by: ["gender", "age_bucket"]
+  heart_rate:
+    strategy: "median"
+    group_by: ["gender", "age_bucket"]
+  cholesterol:
+    strategy: "median"
+    group_by: ["gender", "age_bucket"]
+  systolic_bp:
+    strategy: "median"
+    group_by: ["gender", "age_bucket"]
+  diastolic_bp:
+    strategy: "median"
+    group_by: ["gender", "age_bucket"]
+
+features:
+  numerical:
+    - "age"
+    - "bmi"
+    - "systolic_bp"
+    - "diastolic_bp"
+    - "glucose"
+    - "heart_rate"
+    - "cholesterol"
+    - "admission_frequency"
+    - "medication_count"
+  categorical:
+    - "gender"
+  flags:
+    - "hypertension"
+    - "diabetes"
+    - "previous_cardiac"
+    - "smoking"
+
+ml_params:
+  random_state: 42
+  test_size: 0.2
+  cv_folds: 5
+  classification_threshold: 0.5

@@ -1,0 +1,128 @@
+# Feature Store Registry Schema for CHD Risk Prediction
+
+features:
+  age:
+    description: "Age of the patient at target admission"
+    business_meaning: "Chronological age represents a strong risk multiplier for cardiovascular disease"
+    data_type: "float"
+    unit: "years"
+    clinical_source:
+      table: "patients, admissions"
+      columns: ["anchor_age", "anchor_year", "admittime"]
+    missing_strategy:
+      imputation: "None (Drop row if missing)"
+      clinical_justification: "Patient age is a critical demographic parameter; models cannot predict without it"
+    transformation: "anchor_age + (admit_year - anchor_year) capped at 89"
+    validation_status: "Approved"
+    approved_by: "Clinical Governance Board"
+    feature_owner: "Lead Data Scientist"
+    version: "1.0.0"
+    last_updated: "2026-07-14"
+
+  gender:
+    description: "Binary biological sex"
+    business_meaning: "Cardiovascular risks present differently across biological genders"
+    data_type: "integer"
+    unit: "binary (0: Female, 1: Male)"
+    clinical_source:
+      table: "patients"
+      columns: ["gender"]
+    missing_strategy:
+      imputation: "None (Drop row if missing)"
+      clinical_justification: "Sex is a vital covariate for demographic cohort stratification"
+    transformation: "F mapped to 0, M mapped to 1"
+    validation_status: "Approved"
+    approved_by: "Clinical Governance Board"
+    feature_owner: "Lead Data Scientist"
+    version: "1.0.0"
+    last_updated: "2026-07-14"
+
+  bmi:
+    description: "Body Mass Index"
+    business_meaning: "Elevated BMI is a primary indicator of metabolic syndrome and cardiovascular risk"
+    data_type: "float"
+    unit: "kg/m2"
+    clinical_source:
+      table: "omr"
+      columns: ["result_value"]
+    missing_strategy:
+      imputation: "None (Leave as NULL / NaN)"
+      clinical_justification: "Synthetic BMI values introduce bias and clinical hallucinations"
+    transformation: "Parsed from OMR where result_name is 'BMI (kg/m2)' or calculated as Weight(kg)/Height(m)^2"
+    validation_status: "Approved"
+    approved_by: "Clinical Governance Board"
+    feature_owner: "Clinical Data Engineer"
+    version: "1.0.0"
+    last_updated: "2026-07-14"
+
+  systolic_bp:
+    description: "Systolic Blood Pressure"
+    business_meaning: "Elevated systolic blood pressure (hypertension) strains the coronary arteries"
+    data_type: "float"
+    unit: "mmHg"
+    clinical_source:
+      table: "omr"
+      columns: ["result_value"]
+    missing_strategy:
+      imputation: "Median within age-gender cohort + missingness indicator flag"
+      clinical_justification: "Allows the model to learn baseline risks while capturing the absence of vitals monitoring"
+    transformation: "Parsed from most recent OMR 'Blood Pressure' record matching systolic component before T_pred"
+    validation_status: "Approved"
+    approved_by: "Clinical Governance Board"
+    feature_owner: "Clinical Data Engineer"
+    version: "1.0.0"
+    last_updated: "2026-07-14"
+
+  diastolic_bp:
+    description: "Diastolic Blood Pressure"
+    business_meaning: "Diastolic blood pressure represents arterial pressure during cardiac rest"
+    data_type: "float"
+    unit: "mmHg"
+    clinical_source:
+      table: "omr"
+      columns: ["result_value"]
+    missing_strategy:
+      imputation: "Median within age-gender cohort + missingness indicator flag"
+      clinical_justification: "Captures physiological status during triaging"
+    transformation: "Parsed from most recent OMR 'Blood Pressure' record matching diastolic component before T_pred"
+    validation_status: "Approved"
+    approved_by: "Clinical Governance Board"
+    feature_owner: "Clinical Data Engineer"
+    version: "1.0.0"
+    last_updated: "2026-07-14"
+
+  glucose:
+    description: "Serum glucose measurement"
+    business_meaning: "Hyperglycemia indicates metabolic distress or diabetic status linked to coronary atherogenesis"
+    data_type: "float"
+    unit: "mg/dL"
+    clinical_source:
+      table: "labevents"
+      columns: ["valuenum"]
+    missing_strategy:
+      imputation: "Median within age-gender cohort + missingness indicator flag"
+      clinical_justification: "Glucose checks are only ordered when clinically suspected, creating high missingness rates"
+    transformation: "Most recent glucose measurement (itemid 50931, 50809, 52027, 52569) before T_pred"
+    validation_status: "Approved"
+    approved_by: "Clinical Governance Board"
+    feature_owner: "Clinical Data Engineer"
+    version: "1.0.0"
+    last_updated: "2026-07-14"
+
+  cholesterol:
+    description: "Total Serum Cholesterol or sum of LDL/HDL fractions"
+    business_meaning: "Hypercholesterolemia leads to atherosclerotic plaque build-up in coronary arteries"
+    data_type: "float"
+    unit: "mg/dL"
+    clinical_source:
+      table: "labevents"
+      columns: ["valuenum"]
+    missing_strategy:
+      imputation: "None (Left as NaN / Unavailable)"
+      clinical_justification: "Cholesterol is not standard in acute triages; forcing imputation compromises signal"
+    transformation: "Total cholesterol (itemid 50907) or calculated sum of LDL (50905, 50906) and HDL (50904)"
+    validation_status: "Approved"
+    approved_by: "Clinical Governance Board"
+    feature_owner: "Clinical Data Engineer"
+    version: "1.0.0"
+    last_updated: "2026-07-14"
