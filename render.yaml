@@ -13,7 +13,7 @@ services:
     region: oregon
     branch: main
     buildCommand: pip install -r requirements.txt
-    startCommand: alembic upgrade head && uvicorn backend.main:app --host 0.0.0.0 --port $PORT --workers 1
+    startCommand: alembic -c backend/alembic.ini upgrade head && uvicorn backend.main:app --host 0.0.0.0 --port $PORT --workers 1
     healthCheckPath: /health
     envVars:
       # ⚠️ Set this manually in Render dashboard → use the INTERNAL DB URL
