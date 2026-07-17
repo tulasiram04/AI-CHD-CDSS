@@ -1,9 +1,11 @@
 ##############################################################################
-# render.yaml — AI-CHD-CDSS Render Deployment (Free Tier)
-# Services: PostgreSQL (free) + Backend FastAPI (free) + Frontend Next.js (free)
+# render.yaml — AI-CHD-CDSS Blueprint (Free Tier)
+# Deploy this file via: Render Dashboard → New → Blueprint
+# Repo: https://github.com/tulasiram04/AI-CHD-CDSS
 ##############################################################################
 
 databases:
+  # ── Free PostgreSQL (expires after 90 days on free plan) ─────────────────
   - name: chd-postgres
     databaseName: chd_cdss
     user: chd_user
@@ -11,64 +13,69 @@ databases:
     region: oregon
 
 services:
-  # ─────────────────────────────────────────────────────────
-  # 1. FastAPI Backend (Web Service — Docker)
-  # ─────────────────────────────────────────────────────────
+  # ── 1. FastAPI Backend ────────────────────────────────────────────────────
   - type: web
     name: chd-backend
+    runtime: python
     plan: free
     region: oregon
-    runtime: docker
-    dockerfilePath: ./docker/Dockerfile.backend
-    dockerContext: .
-    buildCommand: ""
-    startCommand: ""
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: alembic upgrade head && uvicorn backend.main:app --host 0.0.0.0 --port $PORT --workers 1
     healthCheckPath: /health
     envVars:
-      - key: ENV
-        value: production
-      - key: DEBUG
-        value: "false"
-      - key: PROJECT_NAME
-        value: AI-CHD-CDSS
+      # Auto-injected from the managed PostgreSQL above
       - key: DATABASE_URL
         fromDatabase:
           name: chd-postgres
           property: connectionString
-      - key: REDIS_URL
-        value: redis://localhost:6379/0   # placeholder — update after deploy
+      # Auto-generated secure random JWT secret
       - key: JWT_SECRET_KEY
         generateValue: true
       - key: JWT_ALGORITHM
         value: HS256
       - key: ACCESS_TOKEN_EXPIRE_MINUTES
         value: "60"
+      - key: ENV
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: PROJECT_NAME
+        value: AI-CHD-CDSS
       - key: RATE_LIMIT_PER_MINUTE
         value: "100"
+      # Redis not available on free tier — Celery tasks are disabled
+      - key: REDIS_URL
+        value: redis://localhost:6379/0
+      # CORS — allow frontend Render URL + localhost for dev
       - key: ALLOWED_ORIGINS
-        value: "https://chd-frontend.onrender.com,http://localhost:3000"
-      - key: MIMIC_DATA_PATH
-        value: /app/data/mimic
+        value: "https://chd-frontend.onrender.com,http://localhost:3000,http://127.0.0.1:3000"
+      # Processed dataset path inside the deployed container
       - key: PROCESSED_DATA_PATH
-        value: /app/etl/processed_chd_dataset/processed_20260714_v1.csv
+        value: /opt/render/project/src/etl/processed_chd_dataset/processed_20260714_v1.csv
+      - key: MIMIC_DATA_PATH
+        value: /opt/render/project/src/data/mimic
+      # Python version (also set in runtime.txt)
+      - key: PYTHON_VERSION
+        value: "3.12.0"
 
-  # ─────────────────────────────────────────────────────────
-  # 2. Next.js Frontend (Web Service — Node)
-  # ─────────────────────────────────────────────────────────
+  # ── 2. Next.js Frontend ───────────────────────────────────────────────────
   - type: web
     name: chd-frontend
+    runtime: node
     plan: free
     region: oregon
-    runtime: node
+    branch: main
     rootDir: frontend
     buildCommand: npm ci && npm run build
     startCommand: npm start
     envVars:
-      - key: NODE_ENV
-        value: production
+      # Points to the backend service deployed above
       - key: NEXT_PUBLIC_API_URL
         value: https://chd-backend.onrender.com
+      - key: NODE_ENV
+        value: production
       - key: NEXT_TELEMETRY_DISABLED
         value: "1"
-      - key: PORT
-        value: "3000"
+      - key: NODE_VERSION
+        value: "20"
