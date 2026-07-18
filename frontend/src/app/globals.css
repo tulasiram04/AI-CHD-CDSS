@@ -2,25 +2,25 @@
 
 @theme {
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
-  --color-background: #F7FBFF;
-  --color-secondary-bg: #E1F0FF;
-  --color-brand-light: #B3D4FF;
-  --color-primary: #8FB3D9;
-  --color-accent: #B3D4FF;
+  --color-background: #F4FAFD;
+  --color-secondary-bg: #E8F6FE;
+  --color-brand-light: #ADE1FB;
+  --color-primary: #266CA9;
+  --color-accent: #266CA9;
   --color-success: #22C55E;
   --color-warning: #F59E0B;
   --color-danger: #EF4444;
-  --color-text-main: #4C6F87;
-  --color-text-muted: #8FA3D9;
-  --color-border-glass: rgba(179, 212, 255, 0.45);
+  --color-text-main: #0F2573;
+  --color-text-muted: #266CA9;
+  --color-border-glass: rgba(173, 225, 251, 0.45);
   
-  --shadow-glass: 0 8px 32px 0 rgba(143, 179, 217, 0.08), 0 1px 2px 0 rgba(0, 0, 0, 0.01);
-  --shadow-glass-hover: 0 12px 40px 0 rgba(143, 179, 217, 0.15), 0 4px 12px 0 rgba(0, 0, 0, 0.02);
+  --shadow-glass: 0 8px 32px 0 rgba(15, 37, 115, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.01);
+  --shadow-glass-hover: 0 12px 40px 0 rgba(15, 37, 115, 0.12), 0 4px 12px 0 rgba(0, 0, 0, 0.02);
 }
 
 :root {
-  --background: #F7FBFF;
-  --foreground: #4C6F87;
+  --background: #F4FAFD;
+  --foreground: #0F2573;
 }
 
 html, body {
@@ -39,11 +39,11 @@ body {
 
 /* Custom Glassmorphism utility classes */
 .glass-panel {
-  background: rgba(225, 240, 255, 0.65);
+  background: rgba(232, 246, 254, 0.65);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(179, 212, 255, 0.45);
-  box-shadow: 0 8px 32px 0 rgba(143, 179, 217, 0.08);
+  border: 1px solid rgba(173, 225, 251, 0.45);
+  box-shadow: 0 8px 32px 0 rgba(15, 37, 115, 0.05);
 }
 
 .glass-panel-hover {
@@ -52,9 +52,9 @@ body {
 
 .glass-panel-hover:hover {
   transform: translateY(-2px);
-  background: rgba(225, 240, 255, 0.78);
-  box-shadow: 0 12px 40px 0 rgba(143, 179, 217, 0.15);
-  border-color: rgba(179, 212, 255, 0.65);
+  background: rgba(232, 246, 254, 0.78);
+  box-shadow: 0 12px 40px 0 rgba(15, 37, 115, 0.10);
+  border-color: rgba(173, 225, 251, 0.65);
 }
 
 /* Premium Scrollbar */
@@ -68,12 +68,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #B3D4FF;
+  background: #ADE1FB;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #8FB3D9;
+  background: #266CA9;
 }
 
 /* Custom Animations */

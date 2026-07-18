@@ -135,11 +135,11 @@ export default function DashboardHome() {
   // Chart Data: Risk Distribution (Age groups)
   const ageDistributionData = useMemo(() => {
     const groups = [
-      { name: "18-35", count: 0, color: "#B3D4FF" },
-      { name: "36-50", count: 0, color: "#8FB3D9" },
-      { name: "51-65", count: 0, color: "#4C6F87" },
-      { name: "66-80", count: 0, color: "#E1F0FF" },
-      { name: "80+", count: 0, color: "#8FB3D9" }
+      { name: "18-35", count: 0, color: "#ADE1FB" },
+      { name: "36-50", count: 0, color: "#266CA9" },
+      { name: "51-65", count: 0, color: "#0F2573" },
+      { name: "66-80", count: 0, color: "#E8F6FE" },
+      { name: "80+", count: 0, color: "#266CA9" }
     ];
 
     if (!patients) return [];
@@ -167,17 +167,17 @@ export default function DashboardHome() {
     <div className="space-y-6">
       
       {/* System Status Strip */}
-      <div className="flex flex-wrap items-center gap-4 px-4 py-3 bg-[#E1F0FF] border border-[#B3D4FF] rounded-xl text-xs font-bold text-[#4C6F87] shadow-sm animate-fade-in">
+      <div className="flex flex-wrap items-center gap-4 px-4 py-3 bg-[#E8F6FE] border border-[#ADE1FB] rounded-xl text-xs font-bold text-[#0F2573] shadow-sm animate-fade-in">
         <div className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
           <span>API Connection: Connected</span>
         </div>
-        <div className="hidden sm:block h-4 w-px bg-[#B3D4FF]" />
+        <div className="hidden sm:block h-4 w-px bg-[#ADE1FB]" />
         <div className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
           <span>Database: PostgreSQL (Pool size: 10)</span>
         </div>
-        <div className="hidden sm:block h-4 w-px bg-[#B3D4FF]" />
+        <div className="hidden sm:block h-4 w-px bg-[#ADE1FB]" />
         <div className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
           <span>ML Engine: CatBoost Staging v{stats.activeModel.version}</span>
@@ -187,11 +187,11 @@ export default function DashboardHome() {
       {/* Welcome Banner */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-black text-[#4C6F87] tracking-tight flex items-center gap-2">
+          <h2 className="text-2xl font-black text-[#0F2573] tracking-tight flex items-center gap-2">
             Clinical Overview Dashboard
-            <Stethoscope className="h-5 w-5 text-[#8FB3D9] fill-[#8FB3D9]/20" />
+            <Stethoscope className="h-5 w-5 text-[#266CA9] fill-[#266CA9]/20" />
           </h2>
-          <p className="text-xs text-[#4C6F87]/70 font-semibold">
+          <p className="text-xs text-[#0F2573]/70 font-semibold">
             Monitor admitted ICU patient cohorts, AI models, and real-time Coronary Heart Disease risk metrics.
           </p>
         </div>
@@ -202,54 +202,54 @@ export default function DashboardHome() {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         {/* Total Patients */}
-        <GlassCard hoverLift className="flex flex-col justify-between h-32 p-5 border-l-4 border-l-[#4C6F87]">
+        <GlassCard hoverLift className="flex flex-col justify-between h-32 p-5 border-l-4 border-l-[#0F2573]">
           <div className="flex justify-between items-start">
-            <span className="text-[9px] font-extrabold text-[#4C6F87]/65 uppercase tracking-wider">Total Cohort</span>
-            <div className="p-1 rounded-lg bg-[#E1F0FF] text-[#4C6F87]">
+            <span className="text-[9px] font-extrabold text-[#0F2573]/65 uppercase tracking-wider">Total Cohort</span>
+            <div className="p-1 rounded-lg bg-[#E8F6FE] text-[#0F2573]">
               <Users className="h-4 w-4" />
             </div>
           </div>
           <div>
-            <p className="text-2xl font-extrabold text-[#4C6F87] tracking-tight leading-none">
+            <p className="text-2xl font-extrabold text-[#0F2573] tracking-tight leading-none">
               {patientsLoading ? "..." : stats.patientsCount}
             </p>
-            <span className="text-[9px] font-bold text-[#8FB3D9] flex items-center gap-0.5 mt-1">
+            <span className="text-[9px] font-bold text-[#266CA9] flex items-center gap-0.5 mt-1">
               <TrendingUp className="h-3 w-3" /> Admitted Patients
             </span>
           </div>
         </GlassCard>
 
         {/* Today's Runs */}
-        <GlassCard hoverLift className="flex flex-col justify-between h-32 p-5 border-l-4 border-l-[#8FB3D9]">
+        <GlassCard hoverLift className="flex flex-col justify-between h-32 p-5 border-l-4 border-l-[#266CA9]">
           <div className="flex justify-between items-start">
-            <span className="text-[9px] font-extrabold text-[#4C6F87]/65 uppercase tracking-wider">Today's Runs</span>
-            <div className="p-1 rounded-lg bg-[#E1F0FF] text-[#8FB3D9]">
+            <span className="text-[9px] font-extrabold text-[#0F2573]/65 uppercase tracking-wider">Today's Runs</span>
+            <div className="p-1 rounded-lg bg-[#E8F6FE] text-[#266CA9]">
               <Activity className="h-4 w-4" />
             </div>
           </div>
           <div>
-            <p className="text-2xl font-extrabold text-[#4C6F87] tracking-tight leading-none">
+            <p className="text-2xl font-extrabold text-[#0F2573] tracking-tight leading-none">
               {stats.todayPredictionsCount}
             </p>
-            <span className="text-[9px] font-bold text-[#4C6F87]/70 flex items-center gap-0.5 mt-1">
+            <span className="text-[9px] font-bold text-[#0F2573]/70 flex items-center gap-0.5 mt-1">
               Active CHD Predictions
             </span>
           </div>
         </GlassCard>
 
         {/* Average CHD Risk */}
-        <GlassCard hoverLift className="flex flex-col justify-between h-32 p-5 border-l-4 border-l-[#B3D4FF]">
+        <GlassCard hoverLift className="flex flex-col justify-between h-32 p-5 border-l-4 border-l-[#ADE1FB]">
           <div className="flex justify-between items-start">
-            <span className="text-[9px] font-extrabold text-[#4C6F87]/65 uppercase tracking-wider">Average CHD Risk</span>
-            <div className="p-1 rounded-lg bg-[#E1F0FF] text-[#4C6F87]">
+            <span className="text-[9px] font-extrabold text-[#0F2573]/65 uppercase tracking-wider">Average CHD Risk</span>
+            <div className="p-1 rounded-lg bg-[#E8F6FE] text-[#0F2573]">
               <Percent className="h-4 w-4" />
             </div>
           </div>
           <div>
-            <p className="text-2xl font-extrabold text-[#4C6F87] tracking-tight leading-none">
+            <p className="text-2xl font-extrabold text-[#0F2573] tracking-tight leading-none">
               {patientsLoading ? "..." : `${stats.avgRisk.toFixed(1)}%`}
             </p>
-            <span className="text-[9px] font-bold text-[#8FB3D9] flex items-center gap-0.5 mt-1">
+            <span className="text-[9px] font-bold text-[#266CA9] flex items-center gap-0.5 mt-1">
               Calibrated Mean Risk
             </span>
           </div>
@@ -258,7 +258,7 @@ export default function DashboardHome() {
         {/* High Risk Patients */}
         <GlassCard hoverLift className="flex flex-col justify-between h-32 p-5 border-l-4 border-l-rose-500">
           <div className="flex justify-between items-start">
-            <span className="text-[9px] font-extrabold text-[#4C6F87]/65 uppercase tracking-wider">High Risk Cohort</span>
+            <span className="text-[9px] font-extrabold text-[#0F2573]/65 uppercase tracking-wider">High Risk Cohort</span>
             <div className="p-1 rounded-lg bg-rose-50 text-rose-500">
               <AlertTriangle className="h-4 w-4" />
             </div>
@@ -276,34 +276,34 @@ export default function DashboardHome() {
         {/* Active AI Model */}
         <GlassCard hoverLift className="flex flex-col justify-between h-32 p-5 border-l-4 border-l-emerald-500">
           <div className="flex justify-between items-start">
-            <span className="text-[9px] font-extrabold text-[#4C6F87]/65 uppercase tracking-wider">Active ML Model</span>
+            <span className="text-[9px] font-extrabold text-[#0F2573]/65 uppercase tracking-wider">Active ML Model</span>
             <div className="p-1 rounded-lg bg-emerald-50 text-emerald-500">
               <Cpu className="h-4 w-4" />
             </div>
           </div>
           <div className="space-y-0.5">
-            <div className="flex justify-between font-extrabold text-[10px] text-[#4C6F87] leading-tight">
+            <div className="flex justify-between font-extrabold text-[10px] text-[#0F2573] leading-tight">
               <span>CatBoost v{stats.activeModel.version}</span>
               <span className="text-[8px] px-1 bg-emerald-100 text-emerald-700 rounded-full font-bold uppercase border border-emerald-200">
                 {stats.activeModel.status}
               </span>
             </div>
-            <div className="flex justify-between text-[8px] font-bold text-[#4C6F87]/60">
+            <div className="flex justify-between text-[8px] font-bold text-[#0F2573]/60">
               <span>Validation AUC:</span>
-              <span className="text-[#4C6F87]">0.868</span>
+              <span className="text-[#0F2573]">0.868</span>
             </div>
           </div>
         </GlassCard>
 
         {/* System Status */}
-        <GlassCard hoverLift className="flex flex-col justify-between h-32 p-5 border-l-4 border-l-[#8FB3D9]">
+        <GlassCard hoverLift className="flex flex-col justify-between h-32 p-5 border-l-4 border-l-[#266CA9]">
           <div className="flex justify-between items-start">
-            <span className="text-[9px] font-extrabold text-[#4C6F87]/65 uppercase tracking-wider">System Checks</span>
-            <div className="p-1 rounded-lg bg-[#E1F0FF] text-[#4C6F87]">
+            <span className="text-[9px] font-extrabold text-[#0F2573]/65 uppercase tracking-wider">System Checks</span>
+            <div className="p-1 rounded-lg bg-[#E8F6FE] text-[#0F2573]">
               <ShieldCheck className="h-4 w-4" />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-1 text-[8px] font-extrabold text-[#4C6F87]">
+          <div className="grid grid-cols-2 gap-1 text-[8px] font-extrabold text-[#0F2573]">
             <div className="flex items-center gap-1">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
               <span>APIs OK</span>
@@ -331,10 +331,10 @@ export default function DashboardHome() {
         {/* Prediction runs line chart */}
         <GlassCard className="lg:col-span-2 space-y-4">
           <div>
-            <h3 className="text-sm font-extrabold text-[#4C6F87] uppercase tracking-wide">
+            <h3 className="text-sm font-extrabold text-[#0F2573] uppercase tracking-wide">
               Prediction Activity Trend
             </h3>
-            <p className="text-[10px] text-[#4C6F87]/70 font-semibold mt-0.5">
+            <p className="text-[10px] text-[#0F2573]/70 font-semibold mt-0.5">
               Daily frequency of CHD evaluations and estimated risk curves.
             </p>
           </div>
@@ -344,13 +344,13 @@ export default function DashboardHome() {
               <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8FB3D9" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#8FB3D9" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#266CA9" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#266CA9" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E1F0FF" />
-                <XAxis dataKey="date" className="text-[9px] font-bold fill-[#4C6F87]" />
-                <YAxis className="text-[9px] font-bold fill-[#4C6F87]" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E8F6FE" />
+                <XAxis dataKey="date" className="text-[9px] font-bold fill-[#0F2573]" />
+                <YAxis className="text-[9px] font-bold fill-[#0F2573]" />
                 <Tooltip
                   contentStyle={{
                     fontSize: "10px",
@@ -365,7 +365,7 @@ export default function DashboardHome() {
                   type="monotone"
                   dataKey="runs"
                   name="Runs Performed"
-                  stroke="#4C6F87"
+                  stroke="#0F2573"
                   fillOpacity={1}
                   fill="url(#chartGradient)"
                   strokeWidth={2.5}
@@ -378,10 +378,10 @@ export default function DashboardHome() {
         {/* Age distribution bar chart */}
         <GlassCard className="space-y-4">
           <div>
-            <h3 className="text-sm font-extrabold text-[#4C6F87] uppercase tracking-wide">
+            <h3 className="text-sm font-extrabold text-[#0F2573] uppercase tracking-wide">
               Age Cohort Density
             </h3>
-            <p className="text-[10px] text-[#4C6F87]/70 font-semibold mt-0.5">
+            <p className="text-[10px] text-[#0F2573]/70 font-semibold mt-0.5">
               Distribution of admitted patients by age group.
             </p>
           </div>
@@ -389,9 +389,9 @@ export default function DashboardHome() {
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={ageDistributionData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E1F0FF" />
-                <XAxis dataKey="name" className="text-[9px] font-bold fill-[#4C6F87]" />
-                <YAxis className="text-[9px] font-bold fill-[#4C6F87]" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E8F6FE" />
+                <XAxis dataKey="name" className="text-[9px] font-bold fill-[#0F2573]" />
+                <YAxis className="text-[9px] font-bold fill-[#0F2573]" />
                 <Tooltip
                   contentStyle={{
                     fontSize: "10px",
@@ -419,10 +419,10 @@ export default function DashboardHome() {
         <GlassCard className="lg:col-span-2 space-y-4">
           <div className="flex justify-between items-center">
             <div>
-              <h3 className="text-sm font-extrabold text-[#4C6F87] uppercase tracking-wide">
+              <h3 className="text-sm font-extrabold text-[#0F2573] uppercase tracking-wide">
                 Recent Admitted Cohorts
               </h3>
-              <p className="text-[10px] text-[#4C6F87]/70 font-semibold mt-0.5">
+              <p className="text-[10px] text-[#0F2573]/70 font-semibold mt-0.5">
                 Overview of newly registered patient medical records.
               </p>
             </div>
@@ -430,7 +430,7 @@ export default function DashboardHome() {
               variant="secondary"
               size="sm"
               onClick={() => router.push("/patients")}
-              className="py-1 border-[#B3D4FF] text-[#4C6F87] hover:bg-[#E1F0FF]"
+              className="py-1 border-[#ADE1FB] text-[#0F2573] hover:bg-[#E8F6FE]"
             >
               <span>Full Registry</span>
               <ArrowRight className="h-3 w-3" />
@@ -440,7 +440,7 @@ export default function DashboardHome() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs font-bold">
               <thead>
-                <tr className="border-b border-[#B3D4FF]/45 text-[#4C6F87]/65 uppercase text-[9px] tracking-wider font-black">
+                <tr className="border-b border-[#ADE1FB]/45 text-[#0F2573]/65 uppercase text-[9px] tracking-wider font-black">
                   <th className="py-2 px-3">Patient UUID</th>
                   <th className="py-2 px-3">hadm ID</th>
                   <th className="py-2 px-3">Age</th>
@@ -449,17 +449,17 @@ export default function DashboardHome() {
                   <th className="py-2 px-3">CHD Risk</th>
                 </tr>
               </thead>
-              <tbody className="text-[#4C6F87]">
+              <tbody className="text-[#0F2573]">
                 {recentPatients.map((p: any) => {
                   const risk = p.chd_risk_score || 0.05;
                   const isHigh = risk >= 0.20;
                   return (
                     <tr
                       key={p.patient_id}
-                      className="border-b border-[#B3D4FF]/20 hover:bg-[#E1F0FF]/30 transition cursor-pointer"
+                      className="border-b border-[#ADE1FB]/20 hover:bg-[#E8F6FE]/30 transition cursor-pointer"
                       onClick={() => router.push(`/patients/${p.patient_id}`)}
                     >
-                      <td className="py-2.5 px-3 font-mono text-[10px] text-[#4C6F87] max-w-[120px] truncate">
+                      <td className="py-2.5 px-3 font-mono text-[10px] text-[#0F2573] max-w-[120px] truncate">
                         {p.patient_uuid}
                       </td>
                       <td className="py-2.5 px-3 font-extrabold">{p.hadm_id}</td>
@@ -484,17 +484,17 @@ export default function DashboardHome() {
         {/* High Risk Alert Cohort */}
         <GlassCard className="space-y-4">
           <div>
-            <h3 className="text-sm font-extrabold text-[#4C6F87] uppercase tracking-wide">
+            <h3 className="text-sm font-extrabold text-[#0F2573] uppercase tracking-wide">
               Critical Alert Board
             </h3>
-            <p className="text-[10px] text-[#4C6F87]/70 font-semibold mt-0.5">
+            <p className="text-[10px] text-[#0F2573]/70 font-semibold mt-0.5">
               Patients requiring immediate cardiologist intervention.
             </p>
           </div>
 
           <div className="space-y-3 max-h-[260px] overflow-y-auto pr-1">
             {stats.highRiskPatients.length === 0 ? (
-              <div className="text-center py-8 text-[#4C6F87]/50 text-xs font-bold">
+              <div className="text-center py-8 text-[#0F2573]/50 text-xs font-bold">
                 No active high-risk patients.
               </div>
             ) : (
@@ -506,7 +506,7 @@ export default function DashboardHome() {
                 >
                   <div className="space-y-0.5">
                     <span className="text-slate-800 font-mono text-[10px]">ID: {p.hadm_id}</span>
-                    <div className="text-[9px] text-[#4C6F87]/60">
+                    <div className="text-[9px] text-[#0F2573]/60">
                       {p.age} yrs old • {p.gender === 1 ? "Male" : "Female"}
                     </div>
                   </div>

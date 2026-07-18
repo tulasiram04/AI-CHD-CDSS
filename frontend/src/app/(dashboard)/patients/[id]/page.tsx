@@ -727,7 +727,7 @@ export default function PatientDetailsHub() {
                 </div>
                 <div className="flex justify-end gap-2 pt-2">
                   <GlassButton type="button" variant="secondary" onClick={() => setActiveActionModal(null)}>Cancel</GlassButton>
-                  <GlassButton type="submit" variant="primary" style={{ backgroundColor: "#4C6F87", color: "#fff" }} disabled={submittingAction}>
+                  <GlassButton type="submit" variant="primary" style={{ backgroundColor: "#0F2573", color: "#fff" }} disabled={submittingAction}>
                     {submittingAction ? "Saving..." : "Save Demographics"}
                   </GlassButton>
                 </div>
@@ -790,7 +790,7 @@ export default function PatientDetailsHub() {
                 </div>
                 <div className="flex justify-end gap-2 pt-2">
                   <GlassButton type="button" variant="secondary" onClick={() => setActiveActionModal(null)}>Cancel</GlassButton>
-                  <GlassButton type="submit" variant="primary" style={{ backgroundColor: "#4C6F87", color: "#fff" }} disabled={submittingAction}>
+                  <GlassButton type="submit" variant="primary" style={{ backgroundColor: "#0F2573", color: "#fff" }} disabled={submittingAction}>
                     {submittingAction ? "Saving..." : "Save Vitals"}
                   </GlassButton>
                 </div>
@@ -847,7 +847,7 @@ export default function PatientDetailsHub() {
                 </div>
                 <div className="flex justify-end gap-2 pt-2">
                   <GlassButton type="button" variant="secondary" onClick={() => setActiveActionModal(null)}>Cancel</GlassButton>
-                  <GlassButton type="submit" variant="primary" style={{ backgroundColor: "#4C6F87", color: "#fff" }} disabled={submittingAction}>
+                  <GlassButton type="submit" variant="primary" style={{ backgroundColor: "#0F2573", color: "#fff" }} disabled={submittingAction}>
                     {submittingAction ? "Uploading..." : "Upload Result"}
                   </GlassButton>
                 </div>
@@ -914,7 +914,7 @@ export default function PatientDetailsHub() {
                 </div>
                 <div className="flex justify-end gap-2 pt-2">
                   <GlassButton type="button" variant="secondary" onClick={() => setActiveActionModal(null)}>Cancel</GlassButton>
-                  <GlassButton type="submit" variant="primary" style={{ backgroundColor: "#4C6F87", color: "#fff" }} disabled={submittingAction}>
+                  <GlassButton type="submit" variant="primary" style={{ backgroundColor: "#0F2573", color: "#fff" }} disabled={submittingAction}>
                     {submittingAction ? "Uploading..." : "Upload Trace"}
                   </GlassButton>
                 </div>
@@ -975,7 +975,7 @@ export default function PatientDetailsHub() {
                 </div>
                 <div className="flex justify-end gap-2 pt-2">
                   <GlassButton type="button" variant="secondary" onClick={() => setActiveActionModal(null)}>Cancel</GlassButton>
-                  <GlassButton type="submit" variant="primary" style={{ backgroundColor: "#4C6F87", color: "#fff" }} disabled={submittingAction}>
+                  <GlassButton type="submit" variant="primary" style={{ backgroundColor: "#0F2573", color: "#fff" }} disabled={submittingAction}>
                     {submittingAction ? "Uploading..." : "Upload Report"}
                   </GlassButton>
                 </div>

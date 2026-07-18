@@ -7,7 +7,7 @@ import { useToast } from "@/providers/ToastProvider";
 
 /* --- Animated ECG Line --------------------------------------------------- */
 function AnimatedECG({
-  color = "#3b82f6",
+  color = "#266CA9",
   opacity = 0.18,
   top,
   bottom,
@@ -237,16 +237,16 @@ export default function LoginPage() {
 
   /* Random particles config */
   const particles = [
-    { x: "8%",  y: "20%", size: 6,  duration: 7,  delay: 0,   color: "#3b82f6" },
+    { x: "8%",  y: "20%", size: 6,  duration: 7,  delay: 0,   color: "#266CA9" },
     { x: "15%", y: "70%", size: 4,  duration: 9,  delay: 1.5, color: "#60a5fa" },
-    { x: "25%", y: "45%", size: 8,  duration: 6,  delay: 0.5, color: "#2563eb" },
-    { x: "38%", y: "80%", size: 5,  duration: 8,  delay: 2,   color: "#3b82f6" },
+    { x: "25%", y: "45%", size: 8,  duration: 6,  delay: 0.5, color: "#0F2573" },
+    { x: "38%", y: "80%", size: 5,  duration: 8,  delay: 2,   color: "#266CA9" },
     { x: "60%", y: "15%", size: 7,  duration: 7,  delay: 1,   color: "#ef4444" },
     { x: "72%", y: "60%", size: 4,  duration: 10, delay: 0.8, color: "#f87171" },
-    { x: "82%", y: "35%", size: 6,  duration: 8,  delay: 2.5, color: "#3b82f6" },
+    { x: "82%", y: "35%", size: 6,  duration: 8,  delay: 2.5, color: "#266CA9" },
     { x: "90%", y: "75%", size: 5,  duration: 6,  delay: 1.2, color: "#60a5fa" },
     { x: "50%", y: "55%", size: 3,  duration: 11, delay: 3,   color: "#ef4444" },
-    { x: "5%",  y: "90%", size: 4,  duration: 9,  delay: 0.3, color: "#2563eb" },
+    { x: "5%",  y: "90%", size: 4,  duration: 9,  delay: 0.3, color: "#0F2573" },
   ];
 
   return (
@@ -291,7 +291,7 @@ export default function LoginPage() {
           to   { transform: rotate(360deg); }
         }
         .login-input:focus {
-          border-color: #3b82f6 !important;
+          border-color: #266CA9 !important;
           box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
         }
         .login-input { transition: border-color 0.18s, box-shadow 0.18s; }
@@ -301,9 +301,9 @@ export default function LoginPage() {
         }
         .sign-in-btn { transition: all 0.18s ease; }
         .request-btn:hover {
-          border-color: #3b82f6 !important;
-          color: #3b82f6 !important;
-          background: #eff6ff !important;
+          border-color: #266CA9 !important;
+          color: #266CA9 !important;
+          background: #E8F6FE !important;
         }
         .request-btn { transition: all 0.18s ease; }
       `}</style>
@@ -317,7 +317,7 @@ export default function LoginPage() {
           fontFamily: "'Inter', 'Segoe UI', sans-serif",
           position: "relative",
           overflow: "hidden",
-          background: "linear-gradient(135deg,#dbeafe 0%,#eff6ff 40%,#e0eeff 70%,#fce7e7 100%)",
+          background: "linear-gradient(135deg,#ADE1FB 0%,#E8F6FE 40%,#E8F6FE 70%,#fce7e7 100%)",
           backgroundSize: "300% 300%",
           animation: "bgShift 14s ease infinite",
         }}
@@ -328,11 +328,11 @@ export default function LoginPage() {
         ))}
 
         {/* -- ECG Lines ------------------------------------------------ */}
-        <AnimatedECG top="10%"  opacity={0.13} duration={7}  delay={0}   color="#3b82f6" />
+        <AnimatedECG top="10%"  opacity={0.13} duration={7}  delay={0}   color="#266CA9" />
         <AnimatedECG top="28%"  opacity={0.09} duration={10} delay={1.5} color="#ef4444" />
-        <AnimatedECG top="50%"  opacity={0.08} duration={8}  delay={0.8} color="#3b82f6" />
+        <AnimatedECG top="50%"  opacity={0.08} duration={8}  delay={0.8} color="#266CA9" />
         <AnimatedECG top="72%"  opacity={0.10} duration={9}  delay={2}   color="#ef4444" />
-        <AnimatedECG bottom="8%" opacity={0.13} duration={7}  delay={0.4} color="#3b82f6" />
+        <AnimatedECG bottom="8%" opacity={0.13} duration={7}  delay={0.4} color="#266CA9" />
 
         {/* -- Large background hearts ---------------------------------- */}
         <AnimatedHeart
@@ -366,8 +366,8 @@ export default function LoginPage() {
             height={c.size}
             viewBox="0 0 24 24"
           >
-            <rect x="10" y="0" width="4" height="24" fill="#2b7de9" rx="2" />
-            <rect x="0" y="10" width="24" height="4" fill="#2b7de9" rx="2" />
+            <rect x="10" y="0" width="4" height="24" fill="#266CA9" rx="2" />
+            <rect x="0" y="10" width="24" height="4" fill="#266CA9" rx="2" />
           </svg>
         ))}
 
@@ -448,7 +448,7 @@ export default function LoginPage() {
               <polyline
                 points="0,26 80,26 105,10 125,38 145,6 168,30 192,26 280,26 305,10 325,38 345,6 368,30 392,26 480,26 505,10 525,38 545,6 568,30 592,26 680,26 705,10 725,38 745,6 768,30 792,26"
                 fill="none"
-                stroke="#3b82f6"
+                stroke="#266CA9"
                 strokeWidth="1.4"
                 opacity="0.35"
               />
@@ -462,7 +462,7 @@ export default function LoginPage() {
                 width: "60px",
                 height: "60px",
                 borderRadius: "18px",
-                background: "linear-gradient(135deg,#3b82f6 0%,#2563eb 100%)",
+                background: "linear-gradient(135deg,#266CA9 0%,#0F2573 100%)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -486,7 +486,7 @@ export default function LoginPage() {
               style={{
                 fontSize: "22px",
                 fontWeight: 800,
-                color: "#1e3a5f",
+                color: "#041D56",
                 letterSpacing: "-0.4px",
                 marginBottom: "5px",
               }}
@@ -514,7 +514,7 @@ export default function LoginPage() {
               style={{
                 fontSize: "18px",
                 fontWeight: 700,
-                color: "#1e293b",
+                color: "#01082D",
                 marginBottom: "4px",
               }}
             >
@@ -602,7 +602,7 @@ export default function LoginPage() {
                   href="#"
                   style={{
                     fontSize: "12px",
-                    color: "#3b82f6",
+                    color: "#266CA9",
                     textDecoration: "none",
                     fontWeight: 500,
                   }}
@@ -657,7 +657,7 @@ export default function LoginPage() {
                 id="remember"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                style={{ accentColor: "#3b82f6", width: "14px", height: "14px", cursor: "pointer" }}
+                style={{ accentColor: "#266CA9", width: "14px", height: "14px", cursor: "pointer" }}
               />
               <label
                 htmlFor="remember"
@@ -677,7 +677,7 @@ export default function LoginPage() {
                 padding: "13px",
                 background: isSubmitting
                   ? "#93c5fd"
-                  : "linear-gradient(135deg,#3b82f6 0%,#2563eb 100%)",
+                  : "linear-gradient(135deg,#266CA9 0%,#0F2573 100%)",
                 color: "#ffffff",
                 border: "none",
                 borderRadius: "10px",
@@ -834,19 +834,19 @@ export default function LoginPage() {
               {/* ECG on heart */}
               <path
                 d="M30 55 L42 55 L47 44 L52 62 L56 48 L60 58 L65 55 L90 55"
-                stroke="#dbeafe"
+                stroke="#ADE1FB"
                 strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 opacity="0.8"
               />
               {/* Chart bars */}
-              <rect x="68" y="10" width="46" height="34" rx="6" fill="#dbeafe" opacity="0.5" />
+              <rect x="68" y="10" width="46" height="34" rx="6" fill="#ADE1FB" opacity="0.5" />
               <rect x="72" y="14" width="38" height="26" rx="4" fill="#bfdbfe" opacity="0.4" />
-              <rect x="75" y="28" width="5" height="10" rx="1" fill="#3b82f6" opacity="0.6" />
-              <rect x="83" y="24" width="5" height="14" rx="1" fill="#3b82f6" opacity="0.7" />
-              <rect x="91" y="20" width="5" height="18" rx="1" fill="#2563eb" opacity="0.8" />
-              <rect x="99" y="25" width="5" height="13" rx="1" fill="#3b82f6" opacity="0.6" />
+              <rect x="75" y="28" width="5" height="10" rx="1" fill="#266CA9" opacity="0.6" />
+              <rect x="83" y="24" width="5" height="14" rx="1" fill="#266CA9" opacity="0.7" />
+              <rect x="91" y="20" width="5" height="18" rx="1" fill="#0F2573" opacity="0.8" />
+              <rect x="99" y="25" width="5" height="13" rx="1" fill="#266CA9" opacity="0.6" />
             </svg>
           </div>
 
@@ -856,7 +856,7 @@ export default function LoginPage() {
               style={{
                 fontSize: "clamp(22px, 2.4vw, 30px)",
                 fontWeight: 800,
-                color: "#1e3a5f",
+                color: "#041D56",
                 lineHeight: "1.25",
                 marginBottom: "12px",
                 letterSpacing: "-0.3px",
@@ -878,9 +878,9 @@ export default function LoginPage() {
               {
                 icon: (
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="10" stroke="#3b82f6" strokeWidth="1.5" />
-                    <path d="M8 12l2 2 4-4" stroke="#3b82f6" strokeWidth="1.8" strokeLinecap="round" />
-                    <path d="M12 7v1M12 16v1M7 12H6M18 12h-1" stroke="#3b82f6" strokeWidth="1.5" strokeLinecap="round" />
+                    <circle cx="12" cy="12" r="10" stroke="#266CA9" strokeWidth="1.5" />
+                    <path d="M8 12l2 2 4-4" stroke="#266CA9" strokeWidth="1.8" strokeLinecap="round" />
+                    <path d="M12 7v1M12 16v1M7 12H6M18 12h-1" stroke="#266CA9" strokeWidth="1.5" strokeLinecap="round" />
                   </svg>
                 ),
                 title: "AI Prediction",
@@ -889,9 +889,9 @@ export default function LoginPage() {
               {
                 icon: (
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 2L4 6v6c0 5.5 3.8 10.7 8 12 4.2-1.3 8-6.5 8-12V6L12 2z" stroke="#3b82f6" strokeWidth="1.6" fill="#eff6ff" />
-                    <rect x="9" y="9" width="6" height="8" rx="1" stroke="#3b82f6" strokeWidth="1.4" />
-                    <circle cx="12" cy="8" r="2" stroke="#3b82f6" strokeWidth="1.4" />
+                    <path d="M12 2L4 6v6c0 5.5 3.8 10.7 8 12 4.2-1.3 8-6.5 8-12V6L12 2z" stroke="#266CA9" strokeWidth="1.6" fill="#E8F6FE" />
+                    <rect x="9" y="9" width="6" height="8" rx="1" stroke="#266CA9" strokeWidth="1.4" />
+                    <circle cx="12" cy="8" r="2" stroke="#266CA9" strokeWidth="1.4" />
                   </svg>
                 ),
                 title: "Role Based Access",
@@ -900,8 +900,8 @@ export default function LoginPage() {
               {
                 icon: (
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <rect x="3" y="3" width="18" height="18" rx="3" stroke="#3b82f6" strokeWidth="1.6" fill="#eff6ff" />
-                    <path d="M7 9h10M7 12h7M7 15h5" stroke="#3b82f6" strokeWidth="1.4" strokeLinecap="round" />
+                    <rect x="3" y="3" width="18" height="18" rx="3" stroke="#266CA9" strokeWidth="1.6" fill="#E8F6FE" />
+                    <path d="M7 9h10M7 12h7M7 15h5" stroke="#266CA9" strokeWidth="1.4" strokeLinecap="round" />
                   </svg>
                 ),
                 title: "Clinical Reports",
@@ -910,9 +910,9 @@ export default function LoginPage() {
               {
                 icon: (
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <circle cx="11" cy="11" r="7" stroke="#3b82f6" strokeWidth="1.6" fill="#eff6ff" />
-                    <path d="M18 18l3 3" stroke="#3b82f6" strokeWidth="1.8" strokeLinecap="round" />
-                    <path d="M8 11l2 2 4-4" stroke="#3b82f6" strokeWidth="1.5" strokeLinecap="round" />
+                    <circle cx="11" cy="11" r="7" stroke="#266CA9" strokeWidth="1.6" fill="#E8F6FE" />
+                    <path d="M18 18l3 3" stroke="#266CA9" strokeWidth="1.8" strokeLinecap="round" />
+                    <path d="M8 11l2 2 4-4" stroke="#266CA9" strokeWidth="1.5" strokeLinecap="round" />
                   </svg>
                 ),
                 title: "Explainable AI",
@@ -921,8 +921,8 @@ export default function LoginPage() {
               {
                 icon: (
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 2L4 6v6c0 5.5 3.8 10.7 8 12 4.2-1.3 8-6.5 8-12V6L12 2z" fill="#eff6ff" stroke="#3b82f6" strokeWidth="1.6" />
-                    <path d="M9 12l2 2 4-4" stroke="#3b82f6" strokeWidth="1.8" strokeLinecap="round" />
+                    <path d="M12 2L4 6v6c0 5.5 3.8 10.7 8 12 4.2-1.3 8-6.5 8-12V6L12 2z" fill="#E8F6FE" stroke="#266CA9" strokeWidth="1.6" />
+                    <path d="M9 12l2 2 4-4" stroke="#266CA9" strokeWidth="1.8" strokeLinecap="round" />
                   </svg>
                 ),
                 title: "Enterprise Security",
@@ -960,7 +960,7 @@ export default function LoginPage() {
                 }}
               >
                 {f.icon}
-                <div style={{ fontSize: "11px", fontWeight: 700, color: "#1e3a5f" }}>{f.title}</div>
+                <div style={{ fontSize: "11px", fontWeight: 700, color: "#041D56" }}>{f.title}</div>
                 <div style={{ fontSize: "10px", color: "#6b7280", lineHeight: "1.4" }}>{f.desc}</div>
               </div>
             ))}
@@ -989,8 +989,8 @@ export default function LoginPage() {
                 {
                   icon: (
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                      <circle cx="12" cy="8" r="3.5" stroke="#3b82f6" strokeWidth="1.6" />
-                      <path d="M5 21c0-4 3.6-7 7-7s7 3 7 7" stroke="#3b82f6" strokeWidth="1.6" strokeLinecap="round" />
+                      <circle cx="12" cy="8" r="3.5" stroke="#266CA9" strokeWidth="1.6" />
+                      <path d="M5 21c0-4 3.6-7 7-7s7 3 7 7" stroke="#266CA9" strokeWidth="1.6" strokeLinecap="round" />
                     </svg>
                   ),
                   label: "Patient Data",
@@ -999,9 +999,9 @@ export default function LoginPage() {
                 {
                   icon: (
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                      <ellipse cx="12" cy="8" rx="7" ry="4" stroke="#3b82f6" strokeWidth="1.6" fill="#eff6ff" />
-                      <path d="M5 8v5c0 2.2 3.1 4 7 4s7-1.8 7-4V8" stroke="#3b82f6" strokeWidth="1.6" />
-                      <path d="M5 13v5c0 2.2 3.1 4 7 4s7-1.8 7-4v-5" stroke="#3b82f6" strokeWidth="1.6" />
+                      <ellipse cx="12" cy="8" rx="7" ry="4" stroke="#266CA9" strokeWidth="1.6" fill="#E8F6FE" />
+                      <path d="M5 8v5c0 2.2 3.1 4 7 4s7-1.8 7-4V8" stroke="#266CA9" strokeWidth="1.6" />
+                      <path d="M5 13v5c0 2.2 3.1 4 7 4s7-1.8 7-4v-5" stroke="#266CA9" strokeWidth="1.6" />
                     </svg>
                   ),
                   label: "AI Analysis",
@@ -1010,7 +1010,7 @@ export default function LoginPage() {
                 {
                   icon: (
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                      <path d="M3 12h3l2-7 4 14 3-9 2 3 4-1" stroke="#3b82f6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M3 12h3l2-7 4 14 3-9 2 3 4-1" stroke="#266CA9" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                       <circle cx="12" cy="12" r="10" stroke="#bfdbfe" strokeWidth="1" strokeDasharray="2 2" />
                     </svg>
                   ),
@@ -1020,8 +1020,8 @@ export default function LoginPage() {
                 {
                   icon: (
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                      <path d="M12 2L4 6v6c0 5.5 3.8 10.7 8 12 4.2-1.3 8-6.5 8-12V6L12 2z" fill="#eff6ff" stroke="#3b82f6" strokeWidth="1.6" />
-                      <path d="M9 12l2 2 4-4" stroke="#3b82f6" strokeWidth="1.8" strokeLinecap="round" />
+                      <path d="M12 2L4 6v6c0 5.5 3.8 10.7 8 12 4.2-1.3 8-6.5 8-12V6L12 2z" fill="#E8F6FE" stroke="#266CA9" strokeWidth="1.6" />
+                      <path d="M9 12l2 2 4-4" stroke="#266CA9" strokeWidth="1.8" strokeLinecap="round" />
                     </svg>
                   ),
                   label: "Clinical Insight",
@@ -1030,9 +1030,9 @@ export default function LoginPage() {
                 {
                   icon: (
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                      <rect x="4" y="2" width="16" height="20" rx="3" stroke="#3b82f6" strokeWidth="1.6" fill="#eff6ff" />
-                      <path d="M8 7h8M8 11h8M8 15h5" stroke="#3b82f6" strokeWidth="1.4" strokeLinecap="round" />
-                      <path d="M15 16l2 2 3-3" stroke="#3b82f6" strokeWidth="1.4" strokeLinecap="round" />
+                      <rect x="4" y="2" width="16" height="20" rx="3" stroke="#266CA9" strokeWidth="1.6" fill="#E8F6FE" />
+                      <path d="M8 7h8M8 11h8M8 15h5" stroke="#266CA9" strokeWidth="1.4" strokeLinecap="round" />
+                      <path d="M15 16l2 2 3-3" stroke="#266CA9" strokeWidth="1.4" strokeLinecap="round" />
                     </svg>
                   ),
                   label: "Action & Report",
@@ -1054,7 +1054,7 @@ export default function LoginPage() {
                         width: "44px",
                         height: "44px",
                         borderRadius: "50%",
-                        background: "#eff6ff",
+                        background: "#E8F6FE",
                         border: "1.5px solid #bfdbfe",
                         display: "flex",
                         alignItems: "center",
@@ -1067,7 +1067,7 @@ export default function LoginPage() {
                       style={{
                         fontSize: "10.5px",
                         fontWeight: 700,
-                        color: "#1e3a5f",
+                        color: "#041D56",
                         textAlign: "center",
                       }}
                     >
@@ -1122,7 +1122,7 @@ export default function LoginPage() {
                 style={{
                   fontSize: "12px",
                   fontWeight: 700,
-                  color: "#1e3a5f",
+                  color: "#041D56",
                   marginBottom: "14px",
                 }}
               >
@@ -1139,9 +1139,9 @@ export default function LoginPage() {
                   {
                     icon: (
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <circle cx="9" cy="7" r="3" stroke="#3b82f6" strokeWidth="1.5" fill="#dbeafe" />
-                        <circle cx="15" cy="7" r="3" stroke="#3b82f6" strokeWidth="1.5" fill="#dbeafe" />
-                        <path d="M3 19c0-3 2.7-5 6-5M21 19c0-3-2.7-5-6-5M9 14c0 0 1.5-0.5 3 0" stroke="#3b82f6" strokeWidth="1.4" strokeLinecap="round" />
+                        <circle cx="9" cy="7" r="3" stroke="#266CA9" strokeWidth="1.5" fill="#ADE1FB" />
+                        <circle cx="15" cy="7" r="3" stroke="#266CA9" strokeWidth="1.5" fill="#ADE1FB" />
+                        <path d="M3 19c0-3 2.7-5 6-5M21 19c0-3-2.7-5-6-5M9 14c0 0 1.5-0.5 3 0" stroke="#266CA9" strokeWidth="1.4" strokeLinecap="round" />
                       </svg>
                     ),
                     value: "4",
@@ -1150,8 +1150,8 @@ export default function LoginPage() {
                   {
                     icon: (
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <rect x="3" y="7" width="18" height="14" rx="2" stroke="#3b82f6" strokeWidth="1.5" fill="#dbeafe" />
-                        <path d="M3 11h18M8 7V4M16 7V4" stroke="#3b82f6" strokeWidth="1.5" strokeLinecap="round" />
+                        <rect x="3" y="7" width="18" height="14" rx="2" stroke="#266CA9" strokeWidth="1.5" fill="#ADE1FB" />
+                        <path d="M3 11h18M8 7V4M16 7V4" stroke="#266CA9" strokeWidth="1.5" strokeLinecap="round" />
                       </svg>
                     ),
                     value: "50",
@@ -1160,7 +1160,7 @@ export default function LoginPage() {
                   {
                     icon: (
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M3 18l4-6 5 4 4-8 5 10" stroke="#3b82f6" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M3 18l4-6 5 4 4-8 5 10" stroke="#266CA9" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     ),
                     value: "0.868",
@@ -1169,8 +1169,8 @@ export default function LoginPage() {
                   {
                     icon: (
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 2L4 6v6c0 5.5 3.8 10.7 8 12 4.2-1.3 8-6.5 8-12V6L12 2z" fill="#dbeafe" stroke="#3b82f6" strokeWidth="1.5" />
-                        <path d="M9 12l2 2 4-4" stroke="#3b82f6" strokeWidth="1.8" strokeLinecap="round" />
+                        <path d="M12 2L4 6v6c0 5.5 3.8 10.7 8 12 4.2-1.3 8-6.5 8-12V6L12 2z" fill="#ADE1FB" stroke="#266CA9" strokeWidth="1.5" />
+                        <path d="M9 12l2 2 4-4" stroke="#266CA9" strokeWidth="1.8" strokeLinecap="round" />
                       </svg>
                     ),
                     value: "100%",
@@ -1189,7 +1189,7 @@ export default function LoginPage() {
                   >
                     {stat.icon}
                     <div
-                      style={{ fontSize: "14px", fontWeight: 800, color: "#1e3a5f" }}
+                      style={{ fontSize: "14px", fontWeight: 800, color: "#041D56" }}
                     >
                       {stat.value}
                     </div>
@@ -1238,7 +1238,7 @@ export default function LoginPage() {
                     <path d="M12 7v5l3 3" stroke="#ca8a04" strokeWidth="1.8" strokeLinecap="round" />
                   </svg>
                 </div>
-                <span style={{ fontSize: "11.5px", fontWeight: 700, color: "#1e3a5f" }}>
+                <span style={{ fontSize: "11.5px", fontWeight: 700, color: "#041D56" }}>
                   Today's Clinical Insight
                 </span>
               </div>
@@ -1250,7 +1250,7 @@ export default function LoginPage() {
                 href="#"
                 style={{
                   fontSize: "11.5px",
-                  color: "#3b82f6",
+                  color: "#266CA9",
                   fontWeight: 600,
                   textDecoration: "none",
                   display: "flex",
@@ -1262,7 +1262,7 @@ export default function LoginPage() {
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
                   <path
                     d="M5 12h14M13 6l6 6-6 6"
-                    stroke="#3b82f6"
+                    stroke="#266CA9"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -1306,7 +1306,7 @@ export default function LoginPage() {
               maxWidth: "480px",
               background: "rgba(255, 255, 255, 0.95)",
               borderRadius: "20px",
-              border: "1.5px solid #3b82f6",
+              border: "1.5px solid #266CA9",
               boxShadow: "0 20px 48px rgba(30, 41, 59, 0.25)",
               padding: "32px",
               boxSizing: "border-box",
@@ -1317,7 +1317,7 @@ export default function LoginPage() {
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
-                <h3 style={{ fontSize: "18px", fontWeight: 800, color: "#1e3a5f", marginBottom: "4px" }}>
+                <h3 style={{ fontSize: "18px", fontWeight: 800, color: "#041D56", marginBottom: "4px" }}>
                   Request Staff Access
                 </h3>
                 <p style={{ fontSize: "11px", color: "#6b7280", fontWeight: 600 }}>
@@ -1330,7 +1330,7 @@ export default function LoginPage() {
                   background: "none",
                   border: "none",
                   fontSize: "20px",
-                  color: "#1e3a5f",
+                  color: "#041D56",
                   cursor: "pointer",
                   fontWeight: "bold",
                   marginLeft: "auto",
@@ -1513,7 +1513,7 @@ export default function LoginPage() {
                 style={{
                   width: "100%",
                   padding: "13px",
-                  background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
+                  background: "linear-gradient(135deg, #266CA9 0%, #0F2573 100%)",
                   color: "white",
                   border: "none",
                   borderRadius: "12px",

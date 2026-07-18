@@ -229,7 +229,7 @@ export default function PatientsRegistry() {
 
         {/* Register New Patient Trigger */}
         {user && ["admin", "doctor", "nurse"].includes(user.role.toLowerCase()) && (
-          <GlassButton variant="primary" size="sm" onClick={() => setIsModalOpen(true)} style={{ backgroundColor: "#4C6F87", color: "#fff" }}>
+          <GlassButton variant="primary" size="sm" onClick={() => setIsModalOpen(true)} style={{ backgroundColor: "#0F2573", color: "#fff" }}>
             <Plus className="h-4 w-4" />
             <span>Register New Patient</span>
           </GlassButton>
@@ -360,7 +360,7 @@ export default function PatientsRegistry() {
                           <GlassButton
                             variant="secondary"
                             size="sm"
-                            className="py-1 px-2.5 border-[#B3D4FF] text-[#4C6F87] hover:bg-[#E1F0FF]"
+                            className="py-1 px-2.5 border-[#ADE1FB] text-[#0F2573] hover:bg-[#E8F6FE]"
                             onClick={() => router.push(`/patients/${p.patient_id}`)}
                           >
                             <Eye className="h-3.5 w-3.5" />
@@ -371,7 +371,7 @@ export default function PatientsRegistry() {
                               variant="primary"
                               size="sm"
                               className="py-1 px-2.5"
-                              style={{ backgroundColor: "#4C6F87", color: "#fff" }}
+                              style={{ backgroundColor: "#0F2573", color: "#fff" }}
                               onClick={() => router.push(`/predict?patient_id=${p.patient_id}`)}
                             >
                               <BrainCircuit className="h-3.5 w-3.5" />
@@ -402,7 +402,7 @@ export default function PatientsRegistry() {
               size="sm"
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="py-1.5 border-[#B3D4FF] text-[#4C6F87] hover:bg-[#E1F0FF]"
+              className="py-1.5 border-[#ADE1FB] text-[#0F2573] hover:bg-[#E8F6FE]"
             >
               <ChevronLeft className="h-4 w-4" />
               <span>Previous</span>
@@ -417,7 +417,7 @@ export default function PatientsRegistry() {
               size="sm"
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="py-1.5 border-[#B3D4FF] text-[#4C6F87] hover:bg-[#E1F0FF]"
+              className="py-1.5 border-[#ADE1FB] text-[#0F2573] hover:bg-[#E8F6FE]"
             >
               <span>Next</span>
               <ChevronRight className="h-4 w-4" />
@@ -429,11 +429,11 @@ export default function PatientsRegistry() {
       {/* -- Patient Registration Modal Overlay -- */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white/95 rounded-2xl border border-[#B3D4FF] shadow-2xl max-w-xl w-full p-6 space-y-4 animate-fade-in my-8 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white/95 rounded-2xl border border-[#ADE1FB] shadow-2xl max-w-xl w-full p-6 space-y-4 animate-fade-in my-8 max-h-[90vh] overflow-y-auto">
             {/* Header */}
-            <div className="flex justify-between items-center border-b border-[#E1F0FF] pb-3">
+            <div className="flex justify-between items-center border-b border-[#E8F6FE] pb-3">
               <div>
-                <h3 className="text-base font-extrabold text-[#4C6F87] uppercase tracking-wide">
+                <h3 className="text-base font-extrabold text-[#0F2573] uppercase tracking-wide">
                   Register New Admitted Patient
                 </h3>
                 <p className="text-[10px] text-slate-400 font-semibold mt-0.5">
@@ -449,7 +449,7 @@ export default function PatientsRegistry() {
             </div>
 
             {/* Form */}
-            <form onSubmit={handleRegisterPatient} className="space-y-4 text-xs font-bold text-[#4C6F87]">
+            <form onSubmit={handleRegisterPatient} className="space-y-4 text-xs font-bold text-[#0F2573]">
               
               {/* Patient Full Name */}
               <div className="space-y-1">
@@ -460,7 +460,7 @@ export default function PatientsRegistry() {
                   placeholder="e.g. John Doe"
                   value={patientName}
                   onChange={(e) => setPatientName(e.target.value)}
-                  className="w-full bg-[#E1F0FF]/30 border border-[#B3D4FF] rounded-xl px-3 py-2 outline-none focus:border-[#8FB3D9] text-[#4C6F87] font-semibold"
+                  className="w-full bg-[#E8F6FE]/30 border border-[#ADE1FB] rounded-xl px-3 py-2 outline-none focus:border-[#266CA9] text-[#0F2573] font-semibold"
                 />
               </div>
 
@@ -476,7 +476,7 @@ export default function PatientsRegistry() {
                     placeholder="e.g. 60"
                     value={age}
                     onChange={(e) => setAge(e.target.value === "" ? "" : Number(e.target.value))}
-                    className="w-full bg-[#E1F0FF]/30 border border-[#B3D4FF] rounded-xl px-3 py-2 outline-none focus:border-[#8FB3D9] text-[#4C6F87] font-semibold"
+                    className="w-full bg-[#E8F6FE]/30 border border-[#ADE1FB] rounded-xl px-3 py-2 outline-none focus:border-[#266CA9] text-[#0F2573] font-semibold"
                   />
                 </div>
                 <div className="space-y-1">
@@ -485,7 +485,7 @@ export default function PatientsRegistry() {
                     value={gender}
                     onChange={(e) => setGender(e.target.value === "" ? "" : Number(e.target.value))}
                     required
-                    className="w-full bg-[#E1F0FF]/30 border border-[#B3D4FF] rounded-xl px-3 py-2 outline-none focus:border-[#8FB3D9] text-[#4C6F87] font-semibold cursor-pointer"
+                    className="w-full bg-[#E8F6FE]/30 border border-[#ADE1FB] rounded-xl px-3 py-2 outline-none focus:border-[#266CA9] text-[#0F2573] font-semibold cursor-pointer"
                   >
                     <option value="" disabled hidden>Select Gender</option>
                     <option value={1}>Male</option>
@@ -495,8 +495,8 @@ export default function PatientsRegistry() {
               </div>
 
               {/* ICU Vitals telemetry */}
-              <div className="border-t border-[#E1F0FF] pt-3">
-                <h4 className="text-[10px] uppercase tracking-wider text-[#4C6F87]/60 mb-2 font-black">ICU Vitals Telemetry</h4>
+              <div className="border-t border-[#E8F6FE] pt-3">
+                <h4 className="text-[10px] uppercase tracking-wider text-[#0F2573]/60 mb-2 font-black">ICU Vitals Telemetry</h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <div className="space-y-1">
                     <label className="text-[9px] text-slate-400 uppercase">Systolic BP</label>
@@ -505,7 +505,7 @@ export default function PatientsRegistry() {
                       placeholder="e.g. 128 mmHg"
                       value={systolicBp}
                       onChange={(e) => setSystolicBp(e.target.value === "" ? "" : Number(e.target.value))}
-                      className="w-full bg-[#E1F0FF]/30 border border-[#B3D4FF] rounded-xl px-2.5 py-1.5 outline-none focus:border-[#8FB3D9]"
+                      className="w-full bg-[#E8F6FE]/30 border border-[#ADE1FB] rounded-xl px-2.5 py-1.5 outline-none focus:border-[#266CA9]"
                     />
                   </div>
                   <div className="space-y-1">
@@ -515,7 +515,7 @@ export default function PatientsRegistry() {
                       placeholder="e.g. 82 mmHg"
                       value={diastolicBp}
                       onChange={(e) => setDiastolicBp(e.target.value === "" ? "" : Number(e.target.value))}
-                      className="w-full bg-[#E1F0FF]/30 border border-[#B3D4FF] rounded-xl px-2.5 py-1.5 outline-none focus:border-[#8FB3D9]"
+                      className="w-full bg-[#E8F6FE]/30 border border-[#ADE1FB] rounded-xl px-2.5 py-1.5 outline-none focus:border-[#266CA9]"
                     />
                   </div>
                   <div className="space-y-1">
@@ -525,7 +525,7 @@ export default function PatientsRegistry() {
                       placeholder="e.g. 74 bpm"
                       value={heartRate}
                       onChange={(e) => setHeartRate(e.target.value === "" ? "" : Number(e.target.value))}
-                      className="w-full bg-[#E1F0FF]/30 border border-[#B3D4FF] rounded-xl px-2.5 py-1.5 outline-none focus:border-[#8FB3D9]"
+                      className="w-full bg-[#E8F6FE]/30 border border-[#ADE1FB] rounded-xl px-2.5 py-1.5 outline-none focus:border-[#266CA9]"
                     />
                   </div>
                   <div className="space-y-1">
@@ -536,15 +536,15 @@ export default function PatientsRegistry() {
                       placeholder="e.g. 26.5 kg/m²"
                       value={bmi}
                       onChange={(e) => setBmi(e.target.value === "" ? "" : Number(e.target.value))}
-                      className="w-full bg-[#E1F0FF]/30 border border-[#B3D4FF] rounded-xl px-2.5 py-1.5 outline-none focus:border-[#8FB3D9]"
+                      className="w-full bg-[#E8F6FE]/30 border border-[#ADE1FB] rounded-xl px-2.5 py-1.5 outline-none focus:border-[#266CA9]"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Lab Diagnostics */}
-              <div className="border-t border-[#E1F0FF] pt-3">
-                <h4 className="text-[10px] uppercase tracking-wider text-[#4C6F87]/60 mb-2 font-black">Lab Diagnostics</h4>
+              <div className="border-t border-[#E8F6FE] pt-3">
+                <h4 className="text-[10px] uppercase tracking-wider text-[#0F2573]/60 mb-2 font-black">Lab Diagnostics</h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <div className="space-y-1">
                     <label className="text-[9px] text-slate-400 uppercase">Serum Cholesterol</label>
@@ -553,7 +553,7 @@ export default function PatientsRegistry() {
                       placeholder="e.g. 185 mg/dL"
                       value={cholesterol}
                       onChange={(e) => setCholesterol(e.target.value === "" ? "" : Number(e.target.value))}
-                      className="w-full bg-[#E1F0FF]/30 border border-[#B3D4FF] rounded-xl px-2.5 py-1.5 outline-none focus:border-[#8FB3D9]"
+                      className="w-full bg-[#E8F6FE]/30 border border-[#ADE1FB] rounded-xl px-2.5 py-1.5 outline-none focus:border-[#266CA9]"
                     />
                   </div>
                   <div className="space-y-1">
@@ -563,7 +563,7 @@ export default function PatientsRegistry() {
                       placeholder="e.g. 95 mg/dL"
                       value={glucose}
                       onChange={(e) => setGlucose(e.target.value === "" ? "" : Number(e.target.value))}
-                      className="w-full bg-[#E1F0FF]/30 border border-[#B3D4FF] rounded-xl px-2.5 py-1.5 outline-none focus:border-[#8FB3D9]"
+                      className="w-full bg-[#E8F6FE]/30 border border-[#ADE1FB] rounded-xl px-2.5 py-1.5 outline-none focus:border-[#266CA9]"
                     />
                   </div>
                   <div className="space-y-1">
@@ -574,22 +574,22 @@ export default function PatientsRegistry() {
                       placeholder="e.g. 3"
                       value={medicationCount}
                       onChange={(e) => setMedicationCount(e.target.value === "" ? "" : Number(e.target.value))}
-                      className="w-full bg-[#E1F0FF]/30 border border-[#B3D4FF] rounded-xl px-2.5 py-1.5 outline-none focus:border-[#8FB3D9] text-[#4C6F87]"
+                      className="w-full bg-[#E8F6FE]/30 border border-[#ADE1FB] rounded-xl px-2.5 py-1.5 outline-none focus:border-[#266CA9] text-[#0F2573]"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Medical Histories & Medications Checkboxes */}
-              <div className="border-t border-[#E1F0FF] pt-3">
-                <h4 className="text-[10px] uppercase tracking-wider text-[#4C6F87]/60 mb-2 font-black">Medical History & Pharmacotherapy</h4>
+              <div className="border-t border-[#E8F6FE] pt-3">
+                <h4 className="text-[10px] uppercase tracking-wider text-[#0F2573]/60 mb-2 font-black">Medical History & Pharmacotherapy</h4>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[10px]">
                   <label className="flex items-center gap-2 cursor-pointer select-none">
                     <input
                       type="checkbox"
                       checked={hypertension}
                       onChange={(e) => setHypertension(e.target.checked)}
-                      className="accent-[#4C6F87] h-4.5 w-4.5"
+                      className="accent-[#0F2573] h-4.5 w-4.5"
                     />
                     <span>Hypertension</span>
                   </label>
@@ -598,7 +598,7 @@ export default function PatientsRegistry() {
                       type="checkbox"
                       checked={diabetes}
                       onChange={(e) => setDiabetes(e.target.checked)}
-                      className="accent-[#4C6F87] h-4.5 w-4.5"
+                      className="accent-[#0F2573] h-4.5 w-4.5"
                     />
                     <span>Diabetes</span>
                   </label>
@@ -607,7 +607,7 @@ export default function PatientsRegistry() {
                       type="checkbox"
                       checked={smoking}
                       onChange={(e) => setSmoking(e.target.checked)}
-                      className="accent-[#4C6F87] h-4.5 w-4.5"
+                      className="accent-[#0F2573] h-4.5 w-4.5"
                     />
                     <span>Smoking History</span>
                   </label>
@@ -616,7 +616,7 @@ export default function PatientsRegistry() {
                       type="checkbox"
                       checked={previousCardiac}
                       onChange={(e) => setPreviousCardiac(e.target.checked)}
-                      className="accent-[#4C6F87] h-4.5 w-4.5"
+                      className="accent-[#0F2573] h-4.5 w-4.5"
                     />
                     <span>Cardiac History</span>
                   </label>
@@ -625,7 +625,7 @@ export default function PatientsRegistry() {
                       type="checkbox"
                       checked={statinHistory}
                       onChange={(e) => setStatinHistory(e.target.checked)}
-                      className="accent-[#4C6F87] h-4.5 w-4.5"
+                      className="accent-[#0F2573] h-4.5 w-4.5"
                     />
                     <span>Statin History</span>
                   </label>
@@ -634,7 +634,7 @@ export default function PatientsRegistry() {
                       type="checkbox"
                       checked={betaBlockerHistory}
                       onChange={(e) => setBetaBlockerHistory(e.target.checked)}
-                      className="accent-[#4C6F87] h-4.5 w-4.5"
+                      className="accent-[#0F2573] h-4.5 w-4.5"
                     />
                     <span>Beta Blocker</span>
                   </label>
@@ -643,7 +643,7 @@ export default function PatientsRegistry() {
                       type="checkbox"
                       checked={aceArbHistory}
                       onChange={(e) => setAceArbHistory(e.target.checked)}
-                      className="accent-[#4C6F87] h-4.5 w-4.5"
+                      className="accent-[#0F2573] h-4.5 w-4.5"
                     />
                     <span>ACE/ARB Therapy</span>
                   </label>
@@ -652,7 +652,7 @@ export default function PatientsRegistry() {
                       type="checkbox"
                       checked={aspirinHistory}
                       onChange={(e) => setAspirinHistory(e.target.checked)}
-                      className="accent-[#4C6F87] h-4.5 w-4.5"
+                      className="accent-[#0F2573] h-4.5 w-4.5"
                     />
                     <span>Aspirin Use</span>
                   </label>
@@ -660,13 +660,13 @@ export default function PatientsRegistry() {
               </div>
 
               {/* Submit Buttons */}
-              <div className="flex justify-end gap-3 border-t border-[#E1F0FF] pt-4">
+              <div className="flex justify-end gap-3 border-t border-[#E8F6FE] pt-4">
                 <GlassButton
                   type="button"
                   variant="secondary"
                   size="sm"
                   onClick={() => setIsModalOpen(false)}
-                  className="border-[#B3D4FF] text-[#4C6F87] hover:bg-[#E1F0FF]"
+                  className="border-[#ADE1FB] text-[#0F2573] hover:bg-[#E8F6FE]"
                 >
                   Cancel
                 </GlassButton>
@@ -675,7 +675,7 @@ export default function PatientsRegistry() {
                   variant="primary"
                   size="sm"
                   disabled={isSubmitting}
-                  style={{ backgroundColor: "#4C6F87", color: "#fff" }}
+                  style={{ backgroundColor: "#0F2573", color: "#fff" }}
                 >
                   {isSubmitting ? "Registering..." : "Submit Registration"}
                 </GlassButton>
