@@ -79,12 +79,13 @@ def signup(user_in: UserCreate, db: Session = Depends(get_db)):
     
     # If the user is a doctor, create a default doctor profile
     if user.role == "doctor":
-        # Create default doctor profile
         doctor = DoctorProfile(
             user_id=user.id,
             license_number=f"MD-{str(user.id)[:8]}",
             specialty="General Medicine",
-            department="Outpatient Department (OPD)"
+            department="Outpatient Department (OPD)",
+            full_name=user_in.full_name or None,
+            phone=user_in.phone or None,
         )
         db.add(doctor)
         db.commit()

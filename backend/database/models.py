@@ -1,8 +1,8 @@
-from datetime import datetime
+from datetime import datetime, date
 import uuid
 from typing import List, Optional
 from sqlalchemy import (
-    String, Integer, Float, Boolean, DateTime, ForeignKey, 
+    String, Integer, Float, Boolean, DateTime, Date, ForeignKey, 
     Text, JSON, Table, Column, Index, Uuid
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -39,6 +39,7 @@ class User(Base, AuditableMixin):
 
     doctor_profile = relationship("DoctorProfile", back_populates="user", uselist=False)
     notifications = relationship("Notification", back_populates="user", foreign_keys="Notification.user_id")
+    notification_preference = relationship("NotificationPreference", back_populates="user", uselist=False)
 
 class DoctorProfile(Base, AuditableMixin):
     __tablename__ = "doctor_profiles"
@@ -48,6 +49,23 @@ class DoctorProfile(Base, AuditableMixin):
     license_number: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     specialty: Mapped[str] = mapped_column(String(100), nullable=False)
     department: Mapped[str] = mapped_column(String(100), nullable=False)
+
+    # Doctor-editable fields
+    full_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    phone: Mapped[Optional[str]] = mapped_column(String(30), nullable=True)
+    experience: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    qualification: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
+    emergency_contact: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    office_extension: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    photo_url: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
+    bio: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    # System-managed field (updated on password change)
+    last_password_changed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    # Super Admin managed fields (read-only in Settings)
+    designation: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    hospital: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
+    medical_council: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
+    license_expiry: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
 
     user = relationship("User", back_populates="doctor_profile")
     appointments = relationship("Appointment", back_populates="doctor")
@@ -355,3 +373,27 @@ class ActivityLog(Base):
     activity_type: Mapped[str] = mapped_column(String(100), nullable=False)
     details: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+
+class NotificationPreference(Base):
+    __tablename__ = "notification_preferences"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("users.id"), unique=True, nullable=False)
+
+    # Alert trigger events
+    pref_prediction: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    pref_high_risk: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    pref_new_patient: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    pref_critical: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    pref_report: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+
+    # Delivery channels
+    pref_email: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    pref_browser: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    pref_system: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    pref_sms: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    browser_permission: Mapped[str] = mapped_column(String(20), default="default", nullable=False)
+
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    user = relationship("User", back_populates="notification_preference")

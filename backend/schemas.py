@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 import uuid
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
@@ -8,6 +8,8 @@ class UserCreate(BaseModel):
     email: str
     password: str = Field(..., min_length=6)
     role: str = Field(default="doctor", description="Role: admin, doctor, auditor, governance")
+    full_name: Optional[str] = Field(None, description="Full display name")
+    phone: Optional[str] = Field(None, description="Contact phone number")
 
 class UserResponse(BaseModel):
     id: uuid.UUID
@@ -27,6 +29,109 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserResponse
+
+# --------------------------------------------------
+# Profile Schemas
+# --------------------------------------------------
+
+class ProfileCompletion(BaseModel):
+    completed: int
+    total: int
+    percentage: int
+
+class NotificationPreferenceResponse(BaseModel):
+    pref_prediction: bool = True
+    pref_high_risk: bool = True
+    pref_new_patient: bool = True
+    pref_critical: bool = True
+    pref_report: bool = True
+    pref_email: bool = True
+    pref_browser: bool = True
+    pref_system: bool = False
+    pref_sms: bool = False
+    browser_permission: str = "default"
+
+    class Config:
+        from_attributes = True
+
+class NotificationPreferenceUpdate(BaseModel):
+    pref_prediction: Optional[bool] = None
+    pref_high_risk: Optional[bool] = None
+    pref_new_patient: Optional[bool] = None
+    pref_critical: Optional[bool] = None
+    pref_report: Optional[bool] = None
+    pref_email: Optional[bool] = None
+    pref_browser: Optional[bool] = None
+    pref_system: Optional[bool] = None
+    pref_sms: Optional[bool] = None
+    browser_permission: Optional[str] = None
+
+class ActivityResponse(BaseModel):
+    id: uuid.UUID
+    activity_type: str
+    details: Optional[str] = None
+    timestamp: datetime
+
+    class Config:
+        from_attributes = True
+
+class SecurityStatusResponse(BaseModel):
+    last_login: Optional[datetime] = None
+    last_password_changed_at: Optional[datetime] = None
+    account_status: str
+    total_activity_count: int
+
+class ProfileResponse(BaseModel):
+    # User identity
+    user_id: uuid.UUID
+    email: str
+    role: str
+    # Doctor profile
+    doctor_profile_id: Optional[uuid.UUID] = None
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    experience: Optional[str] = None
+    qualification: Optional[str] = None
+    emergency_contact: Optional[str] = None
+    office_extension: Optional[str] = None
+    photo_url: Optional[str] = None
+    bio: Optional[str] = None
+    # Admin-managed / read-only
+    license_number: Optional[str] = None
+    specialty: Optional[str] = None
+    department: Optional[str] = None
+    designation: Optional[str] = None
+    hospital: Optional[str] = None
+    medical_council: Optional[str] = None
+    license_expiry: Optional[date] = None
+    last_password_changed_at: Optional[datetime] = None
+    # Computed
+    completion: ProfileCompletion
+    # Nested
+    notifications: NotificationPreferenceResponse
+    security: SecurityStatusResponse
+
+    class Config:
+        from_attributes = True
+
+class ProfileUpdate(BaseModel):
+    """Fields the doctor themselves can edit."""
+    full_name: Optional[str] = Field(None, max_length=100)
+    phone: Optional[str] = Field(None, max_length=30)
+    experience: Optional[str] = Field(None, max_length=50)
+    qualification: Optional[str] = Field(None, max_length=200)
+    emergency_contact: Optional[str] = Field(None, max_length=100)
+    office_extension: Optional[str] = Field(None, max_length=20)
+    bio: Optional[str] = Field(None, max_length=500)
+
+class PasswordUpdateRequest(BaseModel):
+    current_password: str
+    new_password: str = Field(..., min_length=8)
+    confirm_password: str
+
+class PhotoUploadResponse(BaseModel):
+    photo_url: str
+    message: str
 
 # Staff registration requests schemas
 class PendingRegistrationCreate(BaseModel):

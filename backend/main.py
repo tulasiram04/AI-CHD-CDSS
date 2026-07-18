@@ -17,6 +17,7 @@ from backend.audits import router as audit_router
 from backend.patients import router as patient_router
 from backend.notifications import router as notification_router
 from backend.reports import router as reports_router
+from backend.profile import router as profile_router
 
 # Setup API logging
 logging.basicConfig(
@@ -59,6 +60,7 @@ app.include_router(audit_router)
 app.include_router(patient_router)
 app.include_router(notification_router)
 app.include_router(reports_router)
+app.include_router(profile_router)
 
 # Health check endpoint
 @app.get("/health", tags=["System Checks"])
