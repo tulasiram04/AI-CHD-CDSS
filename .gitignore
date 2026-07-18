@@ -82,6 +82,8 @@ scratch/
 !artifacts/plots/shap/CatBoost_calibrator.joblib
 !artifacts/plots/shap/LightGBM_calibrator.joblib
 !artifacts/plots/shap/XGBoost_calibrator.joblib
+!artifacts/models/
+!artifacts/models/best_model.joblib
 
 # Logs
 *.log

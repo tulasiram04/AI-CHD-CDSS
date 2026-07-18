@@ -101,6 +101,31 @@ def get_model():
             if not loaded:
                 raise RuntimeError("No loadable model version found in MLflow registry.")
 
+        except RuntimeError:
+            # ── Joblib fallback for production (Render) ──────────────────────
+            # mlflow.db and mlruns/ are gitignored, so MLflow is unavailable on
+            # Render. Fall back to the committed models/best_model.joblib or artifacts/models/best_model.joblib.
+            base = os.path.dirname(os.path.abspath(__file__))
+            joblib_candidates = [
+                os.path.join(base, "..", "artifacts", "models", "best_model.joblib"),
+                "artifacts/models/best_model.joblib",
+                os.path.join(base, "..", "models", "best_model.joblib"),
+                "models/best_model.joblib",
+                os.path.join(base, "best_model.joblib"),
+            ]
+            for jpath in joblib_candidates:
+                norm = os.path.normpath(jpath)
+                if os.path.exists(norm):
+                    try:
+                        _model = joblib.load(norm)
+                        _model_version = "joblib-fallback"
+                        logger.info(f"Loaded model from joblib fallback: {norm}")
+                        break
+                    except Exception as jlib_err:
+                        logger.warning(f"Could not load joblib from {norm}: {jlib_err}")
+            if _model is None:
+                raise  # re-raise original RuntimeError if joblib also fails
+
         except Exception as e:
             import sys
             if "pytest" in sys.modules or any("pytest" in arg for arg in sys.argv):
