@@ -18,7 +18,7 @@ import {
   Plus,
   ArrowRight,
   Activity,
-  Heart,
+  Stethoscope,
 } from "lucide-react";
 import {
   AreaChart,
@@ -189,7 +189,7 @@ export default function DashboardHome() {
         <div>
           <h2 className="text-2xl font-black text-[#4C6F87] tracking-tight flex items-center gap-2">
             Clinical Overview Dashboard
-            <Heart className="h-5 w-5 text-[#8FB3D9] fill-[#8FB3D9]/20 animate-pulse" />
+            <Stethoscope className="h-5 w-5 text-[#8FB3D9] fill-[#8FB3D9]/20" />
           </h2>
           <p className="text-xs text-[#4C6F87]/70 font-semibold">
             Monitor admitted ICU patient cohorts, AI models, and real-time Coronary Heart Disease risk metrics.

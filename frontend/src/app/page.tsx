@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Heart, Activity, Brain, ShieldAlert, ChevronRight, FileText } from "lucide-react";
+import { Stethoscope, Activity, Brain, ShieldAlert, ChevronRight, FileText } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
 import GlassButton from "@/components/ui/GlassButton";
 
@@ -14,7 +14,7 @@ export default function LandingPage() {
       <header className="glass-panel border-b border-slate-200/40 w-full px-8 py-4 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center gap-3">
           <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center text-white shadow-md shadow-blue-500/20">
-            <Heart className="h-4.5 w-4.5 fill-white animate-pulse" />
+            <Stethoscope className="h-4.5 w-4.5" />
           </div>
           <div>
             <h1 className="font-black text-sm text-slate-800 tracking-tight leading-none">AI-CHD-CDSS</h1>

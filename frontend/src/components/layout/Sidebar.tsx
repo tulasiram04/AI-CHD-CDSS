@@ -15,7 +15,7 @@ import {
   Settings,
   Info,
   LogOut,
-  Heart,
+  Stethoscope,
   UserCheck
 } from "lucide-react";
 
@@ -91,7 +91,7 @@ export default function Sidebar() {
       <div className="space-y-6">
         <Link href="/dashboard" className="flex items-center gap-3 px-2 py-3 hover:opacity-90 transition">
           <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-blue-500/20 text-white">
-            <Heart className="h-5 w-5 fill-white animate-pulse" />
+            <Stethoscope className="h-5 w-5" />
           </div>
           <div>
             <h1 className="font-extrabold text-sm text-slate-800 tracking-tight leading-tight">AI-CHD-CDSS</h1>
