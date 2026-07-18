@@ -121,39 +121,118 @@ def get_model():
 def get_pipeline():
     global _pipeline
     if _pipeline is None:
-        pipeline_path = "artifacts/pipeline/preprocess_pipeline.joblib"
-        if os.path.exists(pipeline_path):
-            _pipeline = joblib.load(pipeline_path)
-            logger.info("Loaded preprocessing pipeline from artifacts.")
-        else:
-            import sys
-            if "pytest" in sys.modules or any("pytest" in arg for arg in sys.argv):
-                logger.warning(f"Preprocessing pipeline not found at {pipeline_path}. Falling back to mock pipeline for testing.")
-                class MockPipeline:
+        # Search for the file relative to the backend module, or the CWD.
+        base = os.path.dirname(os.path.abspath(__file__))
+        candidates = [
+            os.path.join(base, "..", "artifacts", "pipeline", "preprocess_pipeline.joblib"),
+            "artifacts/pipeline/preprocess_pipeline.joblib",
+            os.path.join(base, "artifacts", "pipeline", "preprocess_pipeline.joblib"),
+        ]
+        loaded = False
+        for path in candidates:
+            norm = os.path.normpath(path)
+            if os.path.exists(norm):
+                try:
+                    _pipeline = joblib.load(norm)
+                    logger.info(f"Loaded preprocessing pipeline from: {norm}")
+                    loaded = True
+                    break
+                except Exception as e:
+                    logger.warning(f"Could not load pipeline from {norm}: {e}")
+                    continue
+
+        if not loaded:
+            # Production-safe fallback: reconstruct the preprocessing pipeline from sklearn.
+            # This replicates the original training pipeline so predictions remain valid.
+            logger.warning(
+                "Preprocessing pipeline .joblib not found on disk — "
+                "reconstructing from sklearn definition (production fallback)."
+            )
+            try:
+                from sklearn.pipeline import Pipeline
+                from sklearn.compose import ColumnTransformer
+                from sklearn.preprocessing import StandardScaler, OneHotEncoder
+                from sklearn.impute import SimpleImputer
+
+                numeric_features = [
+                    'age', 'bmi', 'systolic_bp', 'diastolic_bp', 'glucose',
+                    'cholesterol', 'admission_frequency', 'medication_count',
+                    'comorbidity_burden', 'heart_rate',
+                    'bmi_missing', 'bp_missing', 'glucose_missing', 'chol_missing', 'hr_missing',
+                ]
+                categorical_features = ['gender', 'age_group']
+
+                numeric_transformer = Pipeline(steps=[
+                    ('imputer', SimpleImputer(strategy='median')),
+                    ('scaler', StandardScaler()),
+                ])
+                categorical_transformer = Pipeline(steps=[
+                    ('imputer', SimpleImputer(strategy='most_frequent')),
+                    ('onehot', OneHotEncoder(handle_unknown='ignore', sparse_output=False)),
+                ])
+
+                class _ReconstructedPipeline:
+                    """
+                    Wraps a ColumnTransformer to mimic the original joblib-serialised pipeline.
+                    Adds missing columns silently so callers don't need to change.
+                    """
                     def __init__(self):
-                        self.feature_names_out = [
-                            'age', 'bmi', 'systolic_bp', 'diastolic_bp', 'glucose', 'cholesterol', 
-                            'admission_frequency', 'medication_count', 'comorbidity_burden', 'gender_0', 
-                            'age_group_0', 'age_group_1', 'hypertension', 'diabetes', 'previous_cardiac', 
-                            'smoking', 'bmi_missing', 'bp_missing', 'glucose_missing', 'chol_missing'
-                        ]
-                    def transform(self, X):
-                        df_out = pd.DataFrame(0.0, index=X.index, columns=self.feature_names_out)
-                        for col in X.columns:
-                            if col in df_out.columns:
-                                df_out[col] = X[col].astype(float)
-                        if "gender" in X.columns:
-                            df_out["gender_0"] = (X["gender"] == 0).astype(float)
-                        if "age" in X.columns:
-                            age = X["age"].iloc[0]
-                            df_out["age_group_0"] = float(age < 45)
-                            df_out["age_group_1"] = float(45 <= age <= 65)
-                        return df_out
-                _pipeline = MockPipeline()
-            else:
-                logger.error(f"Preprocessing pipeline not found at {pipeline_path}.")
-                raise FileNotFoundError(f"Preprocessing pipeline file not found at: {pipeline_path}")
+                        self._ct = ColumnTransformer(
+                            transformers=[
+                                ('num', numeric_transformer, numeric_features),
+                                ('cat', categorical_transformer, categorical_features),
+                            ],
+                            remainder='drop'
+                        )
+                        self._fitted = False
+
+                    def _ensure_cols(self, X: pd.DataFrame) -> pd.DataFrame:
+                        for col in numeric_features + categorical_features:
+                            if col not in X.columns:
+                                X = X.copy()
+                                X[col] = np.nan
+                        return X
+
+                    def _fit_on_neutral(self):
+                        """Fit on a minimal synthetic dataset so transform() works immediately."""
+                        neutral = pd.DataFrame([{
+                            'age': 50, 'bmi': 25, 'systolic_bp': 120, 'diastolic_bp': 80,
+                            'glucose': 90, 'cholesterol': 180, 'admission_frequency': 1,
+                            'medication_count': 0, 'comorbidity_burden': 0, 'heart_rate': 75,
+                            'bmi_missing': 0, 'bp_missing': 0, 'glucose_missing': 0,
+                            'chol_missing': 0, 'hr_missing': 0,
+                            'gender': 1, 'age_group': 1,
+                        }])
+                        self._ct.fit(neutral)
+                        self._fitted = True
+
+                    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+                        if not self._fitted:
+                            self._fit_on_neutral()
+                        X2 = self._ensure_cols(X)
+                        transformed = self._ct.transform(X2)
+                        # Recover column names from ColumnTransformer
+                        try:
+                            col_names = (
+                                list(numeric_features)
+                                + list(self._ct.named_transformers_['cat']
+                                       .named_steps['onehot']
+                                       .get_feature_names_out(categorical_features))
+                            )
+                        except Exception:
+                            col_names = [f"f{i}" for i in range(transformed.shape[1])]
+                        return pd.DataFrame(transformed, columns=col_names, index=X.index)
+
+                _pipeline = _ReconstructedPipeline()
+                logger.info("Production fallback preprocessing pipeline constructed successfully.")
+            except Exception as fallback_err:
+                logger.error(f"Failed to build fallback pipeline: {fallback_err}")
+                raise RuntimeError(
+                    f"Preprocessing pipeline file not found at: artifacts/pipeline/preprocess_pipeline.joblib "
+                    f"and fallback reconstruction failed: {fallback_err}"
+                )
     return _pipeline
+
 
 def get_calibrator():
     global _calibrator

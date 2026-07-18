@@ -71,9 +71,17 @@ frontend/tsconfig.tsbuildinfo
 # Large data directories
 mimic-iv-clinical-database-2.2/
 
-# Artifacts / scratch
+# Artifacts / scratch — exclude large generated files
 artifacts/
 scratch/
+# Exception: essential ML inference artifacts needed for production deployment
+!artifacts/pipeline/
+!artifacts/pipeline/preprocess_pipeline.joblib
+!artifacts/plots/
+!artifacts/plots/shap/
+!artifacts/plots/shap/CatBoost_calibrator.joblib
+!artifacts/plots/shap/LightGBM_calibrator.joblib
+!artifacts/plots/shap/XGBoost_calibrator.joblib
 
 # Logs
 *.log
