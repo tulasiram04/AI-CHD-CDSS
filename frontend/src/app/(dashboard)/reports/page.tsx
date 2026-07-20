@@ -646,8 +646,8 @@ export default function ReportsCenter() {
                           <td className="py-3 px-3 text-slate-500 font-semibold text-[10px] whitespace-nowrap">{report.generatedDate}</td>
                           {/* Status */}
                           <td className="py-3 px-3"><StatusPill status={report.status} /></td>
-                          {/* Actions — all permanently visible, fixed width */}
-                          <td className="py-3 px-3 w-[220px]">
+                          {/* Actions — Preview, Download, Delete */}
+                          <td className="py-3 px-3 w-[140px]">
                             <div className="flex items-center justify-end gap-1.5 flex-nowrap">
                               {/* Preview */}
                               <button
@@ -656,22 +656,6 @@ export default function ReportsCenter() {
                                 className="p-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-500 hover:bg-blue-50 hover:text-primary hover:border-blue-200 transition flex-shrink-0"
                               >
                                 <Eye className="h-3.5 w-3.5" />
-                              </button>
-                              {/* Print */}
-                              <button
-                                onClick={() => handlePrint(report.name)}
-                                title="Print"
-                                className="p-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-500 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200 transition flex-shrink-0"
-                              >
-                                <Printer className="h-3.5 w-3.5" />
-                              </button>
-                              {/* Share */}
-                              <button
-                                onClick={() => handleShare(report.name)}
-                                title="Share"
-                                className="p-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-500 hover:bg-purple-50 hover:text-purple-600 hover:border-purple-200 transition flex-shrink-0"
-                              >
-                                <Share2 className="h-3.5 w-3.5" />
                               </button>
                               {/* Download */}
                               <button
