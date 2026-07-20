@@ -147,7 +147,7 @@ def test_admission_prediction_success():
     from datetime import datetime
     
     db = SessionLocal()
-    adm = db.query(Admission).filter(Admission.is_deleted == False).first()
+    adm = db.query(Admission).first()
     if not adm:
         # Check if patient already exists to avoid unique constraint error
         patient = db.query(Patient).filter_by(patient_uuid="test-patient-uuid-12345").first()
@@ -155,8 +155,7 @@ def test_admission_prediction_success():
             patient = Patient(
                 patient_uuid="test-patient-uuid-12345",
                 gender=1,
-                anchor_age=60,
-                is_deleted=False
+                anchor_age=60
             )
             db.add(patient)
             db.commit()
@@ -169,7 +168,6 @@ def test_admission_prediction_success():
                 patient_id=patient.id,
                 hadm_id=200001,
                 admittime=datetime.now(),
-                is_deleted=False,
                 bmi=25.0,
                 systolic_bp=120.0,
                 diastolic_bp=80.0,
@@ -188,8 +186,7 @@ def test_admission_prediction_success():
                 itemid=50931,
                 charttime=datetime.now(),
                 valuenum=90.0,
-                valueuom="mg/dL",
-                is_deleted=False
+                valueuom="mg/dL"
             )
             db.add(lab)
             
@@ -200,8 +197,7 @@ def test_admission_prediction_success():
                 admission_id=adm.id,
                 icd_code="401.9",
                 icd_version=9,
-                long_title="Unspecified essential hypertension",
-                is_deleted=False
+                long_title="Unspecified essential hypertension"
             )
             db.add(diag)
             

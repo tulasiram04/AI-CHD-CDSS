@@ -604,30 +604,80 @@ export default function ClinicalPrediction() {
                   </div>
 
                   <div className="mt-2 flex items-center gap-2 flex-wrap justify-center">
-                    <GlassBadge variant={riskClass?.variant ?? "success"} className="text-xs px-3 py-1">
-                      {riskClass?.label ?? ""} Risk
+                    <GlassBadge variant={riskClass?.variant ?? "success"} className="text-xs px-3 py-1 font-black">
+                      {riskClass?.label ?? ""}
                     </GlassBadge>
-                    <GlassBadge variant="neutral" className="text-xs px-3 py-1">
-                      Confidence: {inferenceResult.confidence_score}% ({inferenceResult.confidence_status})
+                    <GlassBadge variant="neutral" className="text-xs px-3 py-1 font-bold">
+                      Prediction Reliability: {inferenceResult.prediction_reliability ?? inferenceResult.confidence_score}% ({inferenceResult.prediction_reliability_status ?? inferenceResult.confidence_status})
                     </GlassBadge>
+                    {inferenceResult.prediction_trend && (
+                      <GlassBadge variant={inferenceResult.prediction_trend.trend === "Worsening" ? "danger" : (inferenceResult.prediction_trend.trend === "Improving" ? "success" : "neutral")} className="text-xs px-3 py-1 font-bold">
+                        Trend: {inferenceResult.prediction_trend.trend}
+                      </GlassBadge>
+                    )}
                   </div>
                 </div>
 
-                {/* Dynamic Clinical Interpretation */}
-                <div className="p-3.5 bg-blue-50/50 border border-blue-100 rounded-2xl space-y-1">
-                  <span className="text-[9px] font-extrabold text-blue-700 uppercase tracking-wider block">Clinical Interpretation</span>
-                  <p className="text-xs text-slate-700 font-semibold leading-relaxed">
-                    {inferenceResult.clinical_interpretation}
-                  </p>
+                {/* Structured Clinical Interpretation */}
+                <div className="p-3.5 bg-blue-50/60 border border-blue-100 rounded-2xl space-y-2 text-left">
+                  <span className="text-[9px] font-extrabold text-blue-700 uppercase tracking-wider block">Structured Clinical Interpretation</span>
+                  {inferenceResult.structured_interpretation ? (
+                    <div className="space-y-1.5 text-xs text-slate-700 font-medium leading-relaxed">
+                      <p className="font-bold text-slate-800">{inferenceResult.structured_interpretation.overall_assessment}</p>
+                      <div><span className="font-bold text-rose-700">Major Risk Drivers: </span>{inferenceResult.structured_interpretation.major_risk_factors.join(", ")}</div>
+                      <div><span className="font-bold text-emerald-700">Protective Factors: </span>{inferenceResult.structured_interpretation.protective_factors.join(", ")}</div>
+                      <div><span className="font-bold text-amber-700">Concern Level: </span>{inferenceResult.structured_interpretation.clinical_concern_level}</div>
+                      <p className="text-[10px] text-slate-500 font-semibold bg-white/70 p-2 rounded-xl border border-blue-100/50 mt-1">{inferenceResult.structured_interpretation.suggested_follow_up}</p>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-slate-700 font-semibold leading-relaxed">
+                      {inferenceResult.clinical_interpretation}
+                    </p>
+                  )}
                 </div>
+
+                {/* Normal Range Comparison Table */}
+                {inferenceResult.normal_range_analysis?.length > 0 && (
+                  <div className="space-y-2 text-left pt-2 border-t border-slate-100">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                      <Activity className="h-4 w-4 text-primary" /> Parameter Normal Range Analysis
+                    </span>
+                    <div className="overflow-x-auto bg-slate-50 p-2.5 rounded-2xl border border-slate-100">
+                      <table className="w-full text-left text-[10px]">
+                        <thead>
+                          <tr className="text-slate-400 text-[8px] uppercase tracking-wider border-b border-slate-200/50 pb-1">
+                            <th className="pb-1 font-bold">Parameter</th>
+                            <th className="pb-1 font-bold">Actual Value</th>
+                            <th className="pb-1 font-bold">Normal Range</th>
+                            <th className="pb-1 font-bold text-right">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 font-medium">
+                          {inferenceResult.normal_range_analysis.map((row: any, idx: number) => (
+                            <tr key={idx} className="hover:bg-slate-100/50">
+                              <td className="py-1.5 font-bold text-slate-700">{row.parameter}</td>
+                              <td className="py-1.5 font-mono text-slate-800">{row.actual_value}</td>
+                              <td className="py-1.5 text-slate-400 font-mono text-[9px]">{row.normal_range}</td>
+                              <td className="py-1.5 text-right font-bold">
+                                <span className={`px-2 py-0.5 rounded-full text-[8px] uppercase font-extrabold ${row.status.includes("Normal") || row.status.includes("Desirable") ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"}`}>
+                                  {row.status}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
 
                 {/* Top Positive & Negative SHAP Contributors */}
                 <div className="space-y-3 text-left pt-2 border-t border-slate-100">
                   <div className="flex justify-between items-center">
                     <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
-                      <Activity className="h-4 w-4 text-primary" /> Top SHAP Risk Contributors
+                      <Cpu className="h-4 w-4 text-primary" /> Dynamic SHAP Feature Explainability
                     </span>
-                    <span className="text-[9px] text-slate-400 font-mono">XAI Attributions</span>
+                    <span className="text-[9px] text-slate-400 font-mono">TreeExplainer Attributions</span>
                   </div>
 
                   {/* Positive Risk Increases */}
@@ -640,10 +690,12 @@ export default function ClinicalPrediction() {
                         {inferenceResult.top_positive_contributors.map((contrib: any, idx: number) => (
                           <div key={idx} className="p-2 bg-rose-50/50 border border-rose-100 rounded-xl text-[10px] space-y-1">
                             <div className="flex justify-between font-bold text-slate-700">
-                              <span>▲ {contrib.feature}</span>
-                              <span className="text-rose-600 font-mono">{contrib.impact}</span>
+                              <span>▲ {contrib.feature} ({contrib.actual_value || contrib.detail})</span>
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[8px] bg-rose-200/60 text-rose-800 px-1.5 py-0.5 rounded font-extrabold">{contrib.importance_level || "High Impact"}</span>
+                                <span className="text-rose-600 font-mono font-black">{contrib.impact}</span>
+                              </div>
                             </div>
-                            {contrib.detail && <p className="text-[9px] text-slate-400 font-medium">{contrib.detail}</p>}
                           </div>
                         ))}
                       </div>
@@ -660,10 +712,12 @@ export default function ClinicalPrediction() {
                         {inferenceResult.top_negative_contributors.map((contrib: any, idx: number) => (
                           <div key={idx} className="p-2 bg-emerald-50/50 border border-emerald-100 rounded-xl text-[10px] space-y-1">
                             <div className="flex justify-between font-bold text-slate-700">
-                              <span>▼ {contrib.feature}</span>
-                              <span className="text-emerald-600 font-mono">{contrib.impact}</span>
+                              <span>▼ {contrib.feature} ({contrib.actual_value || contrib.detail})</span>
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[8px] bg-emerald-200/60 text-emerald-800 px-1.5 py-0.5 rounded font-extrabold">{contrib.importance_level || "Protective"}</span>
+                                <span className="text-emerald-600 font-mono font-black">{contrib.impact}</span>
+                              </div>
                             </div>
-                            {contrib.detail && <p className="text-[9px] text-slate-400 font-medium">{contrib.detail}</p>}
                           </div>
                         ))}
                       </div>
@@ -724,11 +778,13 @@ export default function ClinicalPrediction() {
                     <span className="text-[9px] text-slate-400 uppercase block tracking-wider">Model Technical Specs</span>
                     <div className="grid grid-cols-2 gap-1 text-[9px]">
                       <div><span className="text-slate-400">Model Name:</span> {inferenceResult.model_details.model_name}</div>
+                      <div><span className="text-slate-400">Algorithm:</span> {inferenceResult.model_details.algorithm || "CatBoost / XGBoost"}</div>
                       <div><span className="text-slate-400">Version:</span> {inferenceResult.model_details.model_version}</div>
+                      <div><span className="text-slate-400">Dataset:</span> {inferenceResult.model_details.training_dataset || "MIMIC-IV v2.2"}</div>
                       <div><span className="text-slate-400">Calibration:</span> {inferenceResult.model_details.calibration_method}</div>
                       <div><span className="text-slate-400">ROC-AUC:</span> {(inferenceResult.model_details.validation_roc_auc * 100).toFixed(1)}%</div>
+                      <div><span className="text-slate-400">CV Score:</span> {(inferenceResult.model_details.cross_validation_score * 100).toFixed(1)}%</div>
                       <div><span className="text-slate-400">Latency:</span> {inferenceResult.execution_latency_ms.toFixed(1)} ms</div>
-                      <div><span className="text-slate-400">Training Date:</span> {inferenceResult.model_details.training_date}</div>
                     </div>
                   </div>
                 )}

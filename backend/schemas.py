@@ -165,11 +165,11 @@ class PredictionRequest(BaseModel):
     age: float = Field(..., ge=18, le=120, description="Age in years (18-120)")
     gender: int = Field(..., ge=0, le=1, description="0: Female, 1: Male")
     bmi: Optional[float] = Field(None, ge=10, le=70, description="Body Mass Index (10-70)")
-    systolic_bp: Optional[float] = Field(None, ge=70, le=260, description="Systolic BP (70-260 mmHg)")
-    diastolic_bp: Optional[float] = Field(None, ge=40, le=180, description="Diastolic BP (40-180 mmHg)")
+    systolic_bp: Optional[float] = Field(None, ge=60, le=260, description="Systolic BP (60-260 mmHg)")
+    diastolic_bp: Optional[float] = Field(None, ge=30, le=180, description="Diastolic BP (30-180 mmHg)")
     glucose: Optional[float] = Field(None, ge=20, le=800, description="Glucose (20-800 mg/dL)")
-    heart_rate: Optional[float] = Field(None, ge=30, le=220, description="Heart rate (30-220 bpm)")
-    cholesterol: Optional[float] = Field(None, ge=50, le=700, description="Cholesterol (50-700 mg/dL)")
+    heart_rate: Optional[float] = Field(None, ge=25, le=220, description="Heart rate (25-220 bpm)")
+    cholesterol: Optional[float] = Field(None, ge=50, le=800, description="Cholesterol (50-800 mg/dL)")
     admission_frequency: int = Field(default=1, ge=0)
     medication_count: int = Field(default=0, ge=0)
     hypertension: int = Field(default=0, ge=0, le=1)
@@ -188,10 +188,31 @@ class RecommendationItem(BaseModel):
 
 class TopContributorItem(BaseModel):
     feature: str
-    impact: str
+    actual_value: str
     direction: str  # "positive" or "negative"
+    impact: str
+    importance_level: str  # "Very High Impact", "High Impact", "Medium Impact", "Low Impact", "Protective"
     detail: Optional[str] = None
     value: float
+
+class NormalRangeItem(BaseModel):
+    parameter: str
+    actual_value: str
+    normal_range: str
+    status: str
+
+class StructuredInterpretation(BaseModel):
+    overall_assessment: str
+    major_risk_factors: List[str]
+    protective_factors: List[str]
+    clinical_concern_level: str
+    suggested_follow_up: str
+
+class PredictionTrendInfo(BaseModel):
+    previous_risk: Optional[float] = None
+    current_risk: float
+    difference: Optional[float] = None
+    trend: str  # "Improving", "Stable", "Worsening", or "Baseline Evaluation"
 
 class PatientSummaryInfo(BaseModel):
     age: float
@@ -206,11 +227,15 @@ class PatientSummaryInfo(BaseModel):
 
 class ModelMetadataDetails(BaseModel):
     model_name: str
+    algorithm: str
     model_version: str
-    training_date: str
+    training_dataset: str
     calibration_method: str
     inference_time_ms: float
     validation_roc_auc: float
+    cross_validation_score: float
+    prediction_id: str
+    prediction_timestamp: str
 
 class PredictionResponse(BaseModel):
     prediction_uuid: str
@@ -218,9 +243,14 @@ class PredictionResponse(BaseModel):
     raw_probability: float
     calibrated_probability: float
     risk_level: str
+    prediction_reliability: float
+    prediction_reliability_status: str
     confidence_score: float
     confidence_status: str
     clinical_interpretation: str
+    structured_interpretation: StructuredInterpretation
+    normal_range_analysis: List[NormalRangeItem]
+    prediction_trend: PredictionTrendInfo
     recommendations: List[RecommendationItem]
     top_positive_contributors: List[TopContributorItem]
     top_negative_contributors: List[TopContributorItem]
