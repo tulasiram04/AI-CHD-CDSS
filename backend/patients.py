@@ -505,3 +505,40 @@ def list_patient_reports(
         for r in reports
     ]
 
+
+@router.delete("/{patient_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_patient(
+    patient_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Soft-deletes a patient record and their active admissions. Restricted to doctors."""
+    if current_user.role.lower() != "doctor":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: Only doctors can delete patient records."
+        )
+        
+    patient = db.query(Patient).filter(Patient.id == patient_id, Patient.is_deleted == False).first()
+    if not patient:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Patient record not found."
+        )
+        
+    # Soft delete the patient
+    patient.is_deleted = True
+    patient.deleted_at = datetime.utcnow()
+    patient.deleted_by = current_user.id
+    
+    # Soft delete associated admissions
+    admissions = db.query(Admission).filter(Admission.patient_id == patient.id, Admission.is_deleted == False).all()
+    for admission in admissions:
+        admission.is_deleted = True
+        admission.deleted_at = datetime.utcnow()
+        admission.deleted_by = current_user.id
+        
+    db.commit()
+    return
+
+

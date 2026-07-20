@@ -23,7 +23,8 @@ import {
   FileText,
   Activity as HeartPulse,
   ShieldAlert,
-  X
+  X,
+  Trash2
 } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
 import GlassButton from "@/components/ui/GlassButton";
@@ -73,6 +74,24 @@ export default function PatientDetailsHub() {
   const [radImpression, setRadImpression] = useState<string>("");
 
   const [submittingAction, setSubmittingAction] = useState<boolean>(false);
+  
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<boolean>(false);
+  const [deleteConfirmationText, setDeleteConfirmationText] = useState<string>("");
+
+  const handleDeletePatient = async () => {
+    setSubmittingAction(true);
+    try {
+      await api.delete(`/api/v1/patients/${patientId}`);
+      toast("Patient record successfully removed from the registry.", "success", "Patient Deleted");
+      router.push("/patients");
+    } catch (err: any) {
+      toast(err.response?.data?.detail || "Failed to delete patient record.", "error", "Deletion Failed");
+    } finally {
+      setSubmittingAction(false);
+      setShowDeleteConfirm(false);
+      setDeleteConfirmationText("");
+    }
+  };
 
   // 1. Fetch single patient details
   const { data: patient, isLoading: patientLoading, refetch: refetchPatient } = useQuery({
@@ -427,70 +446,101 @@ export default function PatientDetailsHub() {
                   <Settings className="h-4.5 w-4.5 text-slate-600" />
                   <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Clinical Actions Hub</h4>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   {/* Demographics update: Admin, Doctor, Nurse */}
                   {["admin", "doctor", "nurse"].includes(user.role.toLowerCase()) && (
-                    <GlassButton
-                      variant="secondary"
-                      size="sm"
-                      className="w-full justify-start text-xs font-bold border-slate-200/60 hover:bg-slate-50"
+                    <button
                       onClick={openDemographics}
+                      className="w-full text-left p-3 rounded-xl border border-indigo-100/50 bg-indigo-500/5 hover:bg-indigo-500/10 hover:border-indigo-300 hover:scale-[1.02] active:scale-[0.99] transition-all duration-300 flex items-start gap-3 group cursor-pointer"
                     >
-                      <Settings className="h-4 w-4 mr-2 text-indigo-500" />
-                      <span>Edit Demographics</span>
-                    </GlassButton>
+                      <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-600 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300">
+                        <Settings className="h-4 w-4" />
+                      </div>
+                      <div className="space-y-0.5">
+                        <h5 className="text-xs font-extrabold text-slate-800">Edit Demographics</h5>
+                        <p className="text-[10px] text-slate-500 font-medium">Update patient age and biological gender records.</p>
+                      </div>
+                    </button>
                   )}
 
                   {/* Vitals update: Admin, Doctor, Nurse */}
                   {["admin", "doctor", "nurse"].includes(user.role.toLowerCase()) && (
-                    <GlassButton
-                      variant="secondary"
-                      size="sm"
-                      className="w-full justify-start text-xs font-bold border-slate-200/60 hover:bg-slate-50"
+                    <button
                       onClick={openVitals}
+                      className="w-full text-left p-3 rounded-xl border border-rose-100/50 bg-rose-500/5 hover:bg-rose-500/10 hover:border-rose-300 hover:scale-[1.02] active:scale-[0.99] transition-all duration-300 flex items-start gap-3 group cursor-pointer"
                     >
-                      <HeartPulse className="h-4 w-4 mr-2 text-rose-500" />
-                      <span>Update Vitals</span>
-                    </GlassButton>
+                      <div className="p-2 rounded-lg bg-rose-500/10 text-rose-600 group-hover:bg-rose-500 group-hover:text-white transition-all duration-300">
+                        <HeartPulse className="h-4 w-4" />
+                      </div>
+                      <div className="space-y-0.5">
+                        <h5 className="text-xs font-extrabold text-slate-800">Update Vitals</h5>
+                        <p className="text-[10px] text-slate-500 font-medium">Log blood pressure, heart rate, and BMI values.</p>
+                      </div>
+                    </button>
                   )}
 
                   {/* Upload Labs: Admin, Doctor, Lab Tech */}
                   {["admin", "doctor", "lab tech"].includes(user.role.toLowerCase()) && (
-                    <GlassButton
-                      variant="secondary"
-                      size="sm"
-                      className="w-full justify-start text-xs font-bold border-slate-200/60 hover:bg-slate-50"
+                    <button
                       onClick={() => setActiveActionModal("labs")}
+                      className="w-full text-left p-3 rounded-xl border border-emerald-100/50 bg-emerald-500/5 hover:bg-emerald-500/10 hover:border-emerald-300 hover:scale-[1.02] active:scale-[0.99] transition-all duration-300 flex items-start gap-3 group cursor-pointer"
                     >
-                      <FileSpreadsheet className="h-4 w-4 mr-2 text-emerald-500" />
-                      <span>Upload Lab Results</span>
-                    </GlassButton>
+                      <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
+                        <FileSpreadsheet className="h-4 w-4" />
+                      </div>
+                      <div className="space-y-0.5">
+                        <h5 className="text-xs font-extrabold text-slate-800">Upload Lab Results</h5>
+                        <p className="text-[10px] text-slate-500 font-medium">Add metabolic panel, glucose, or cardiac biomarker data.</p>
+                      </div>
+                    </button>
                   )}
 
                   {/* Upload ECG: Admin, Doctor, ECG Tech */}
                   {["admin", "doctor", "ecg tech"].includes(user.role.toLowerCase()) && (
-                    <GlassButton
-                      variant="secondary"
-                      size="sm"
-                      className="w-full justify-start text-xs font-bold border-slate-200/60 hover:bg-slate-50"
+                    <button
                       onClick={() => setActiveActionModal("ecg")}
+                      className="w-full text-left p-3 rounded-xl border border-sky-100/50 bg-sky-500/5 hover:bg-sky-500/10 hover:border-sky-300 hover:scale-[1.02] active:scale-[0.99] transition-all duration-300 flex items-start gap-3 group cursor-pointer"
                     >
-                      <Activity className="h-4 w-4 mr-2 text-sky-500" />
-                      <span>Upload ECG Trace</span>
-                    </GlassButton>
+                      <div className="p-2 rounded-lg bg-sky-500/10 text-sky-600 group-hover:bg-sky-500 group-hover:text-white transition-all duration-300">
+                        <Activity className="h-4 w-4" />
+                      </div>
+                      <div className="space-y-0.5">
+                        <h5 className="text-xs font-extrabold text-slate-800">Upload ECG Trace</h5>
+                        <p className="text-[10px] text-slate-500 font-medium">Record wave intervals and clinical telemetry interpretations.</p>
+                      </div>
+                    </button>
                   )}
 
                   {/* Upload Radiology: Admin, Doctor, Radiology Tech */}
                   {["admin", "doctor", "radiology tech"].includes(user.role.toLowerCase()) && (
-                    <GlassButton
-                      variant="secondary"
-                      size="sm"
-                      className="w-full justify-start text-xs font-bold border-slate-200/60 hover:bg-slate-50"
+                    <button
                       onClick={() => setActiveActionModal("radiology")}
+                      className="w-full text-left p-3 rounded-xl border border-amber-100/50 bg-amber-500/5 hover:bg-amber-500/10 hover:border-amber-300 hover:scale-[1.02] active:scale-[0.99] transition-all duration-300 flex items-start gap-3 group cursor-pointer"
                     >
-                      <UploadCloud className="h-4 w-4 mr-2 text-amber-500" />
-                      <span>Upload Radiology Report</span>
-                    </GlassButton>
+                      <div className="p-2 rounded-lg bg-amber-500/10 text-amber-600 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300">
+                        <UploadCloud className="h-4 w-4" />
+                      </div>
+                      <div className="space-y-0.5">
+                        <h5 className="text-xs font-extrabold text-slate-800">Upload Radiology Report</h5>
+                        <p className="text-[10px] text-slate-500 font-medium">Submit findings and impressions for CT, MRI or X-Ray scans.</p>
+                      </div>
+                    </button>
+                  )}
+
+                  {/* Delete Patient: Doctor Only */}
+                  {user.role.toLowerCase() === "doctor" && (
+                    <button
+                      onClick={() => setShowDeleteConfirm(true)}
+                      className="w-full text-left p-3 rounded-xl border border-rose-200/60 bg-rose-600/5 hover:bg-rose-600/10 hover:border-rose-400 hover:scale-[1.02] active:scale-[0.99] transition-all duration-300 flex items-start gap-3 group cursor-pointer mt-4"
+                    >
+                      <div className="p-2 rounded-lg bg-rose-600/10 text-rose-700 group-hover:bg-rose-600 group-hover:text-white transition-all duration-300">
+                        <Trash2 className="h-4 w-4" />
+                      </div>
+                      <div className="space-y-0.5">
+                        <h5 className="text-xs font-extrabold text-rose-700">Delete Patient Record</h5>
+                        <p className="text-[10px] text-rose-500 font-medium">Soft-delete this patient case file from the active registry.</p>
+                      </div>
+                    </button>
                   )}
                   
                   {/* Informational banner if no actions are available */}
@@ -981,6 +1031,67 @@ export default function PatientDetailsHub() {
                 </div>
               </form>
             )}
+          </GlassCard>
+        </div>
+      )}
+
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <GlassCard className="w-full max-w-md p-6 relative bg-white/95 shadow-2xl animate-in fade-in zoom-in-95 duration-150 border-rose-100">
+            <button
+              onClick={() => {
+                setShowDeleteConfirm(false);
+                setDeleteConfirmationText("");
+              }}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 transition cursor-pointer"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <div className="space-y-4 text-xs font-bold text-slate-700">
+              <div className="flex items-center gap-2 text-rose-600 pb-2 border-b border-rose-100">
+                <ShieldAlert className="h-5 w-5" />
+                <h3 className="text-sm font-black uppercase tracking-wider">Critical Action: Delete Patient</h3>
+              </div>
+              
+              <div className="bg-rose-50 border border-rose-200/50 rounded-xl p-3 text-rose-700 font-semibold leading-relaxed space-y-1">
+                <p><strong>Warning:</strong> Deleting this patient soft-deletes the patient record and all active admission logs from the database.</p>
+                <p>This critical action will be logged in the system audit trail.</p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-slate-500 font-bold">
+                  To confirm, type <span className="font-mono text-rose-600 select-all">DELETE</span> in the box below:
+                </label>
+                <input
+                  type="text"
+                  placeholder="Type DELETE to confirm"
+                  className="w-full border border-slate-200 rounded-xl p-2.5 bg-slate-50 text-slate-800 font-extrabold focus:outline-none focus:ring-1 focus:ring-rose-500 uppercase tracking-widest text-center"
+                  value={deleteConfirmationText}
+                  onChange={(e) => setDeleteConfirmationText(e.target.value)}
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <GlassButton
+                  type="button"
+                  variant="secondary"
+                  onClick={() => {
+                    setShowDeleteConfirm(false);
+                    setDeleteConfirmationText("");
+                  }}
+                >
+                  Cancel
+                </GlassButton>
+                <GlassButton
+                  type="button"
+                  variant="danger"
+                  disabled={deleteConfirmationText !== "DELETE" || submittingAction}
+                  onClick={handleDeletePatient}
+                >
+                  {submittingAction ? "Deleting..." : "Permanently Delete Patient"}
+                </GlassButton>
+              </div>
+            </div>
           </GlassCard>
         </div>
       )}
