@@ -2,11 +2,33 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useToast } from "@/providers/ToastProvider";
 import { useAuth } from "@/providers/AuthProvider";
-import { BrainCircuit, Search, ShieldAlert, Cpu, ListCollapse, FileText, Activity } from "lucide-react";
+import {
+  BrainCircuit,
+  Search,
+  ShieldAlert,
+  Cpu,
+  ListCollapse,
+  FileText,
+  Activity,
+  CheckCircle2,
+  TrendingUp,
+  TrendingDown,
+  Layers,
+  ShieldCheck,
+  User,
+  Info,
+  Lock,
+  Sliders,
+  Edit3,
+  BarChart3,
+  Award,
+  Clock,
+  Check
+} from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
 import GlassButton from "@/components/ui/GlassButton";
 import GlassBadge from "@/components/ui/GlassBadge";
@@ -16,38 +38,41 @@ export default function ClinicalPrediction() {
   const searchParams = useSearchParams();
   const routerPatientId = searchParams.get("patient_id");
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  // ALL hooks declared unconditionally BEFORE any early return
+  // Mode and override state
   const [selectedPatientId, setSelectedPatientId] = useState("");
   const [inputType, setInputType] = useState<"lookup" | "manual">("lookup");
+  const [overridePatientValues, setOverridePatientValues] = useState(false);
   const [inferenceResult, setInferenceResult] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Form state
-  const [age, setAge] = useState(60);
-  const [gender, setGender] = useState(1);
+  // Form input fields
+  const [age, setAge] = useState<number | string>(60);
+  const [gender, setGender] = useState<number>(1);
   const [bmi, setBmi] = useState<number | string>(25.0);
   const [systolicBp, setSystolicBp] = useState<number | string>(120);
   const [diastolicBp, setDiastolicBp] = useState<number | string>(80);
   const [glucose, setGlucose] = useState<number | string>(90);
   const [heartRate, setHeartRate] = useState<number | string>(70);
   const [cholesterol, setCholesterol] = useState<number | string>(180);
-  const [admissionFrequency, setAdmissionFrequency] = useState(1);
-  const [medicationCount, setMedicationCount] = useState(1);
+  const [admissionFrequency, setAdmissionFrequency] = useState<number>(1);
+  const [medicationCount, setMedicationCount] = useState<number>(1);
 
-  // Comorbidity flags
-  const [hypertension, setHypertension] = useState(0);
-  const [diabetes, setDiabetes] = useState(0);
-  const [smoking, setSmoking] = useState(0);
-  const [previousCardiac, setPreviousCardiac] = useState(0);
+  // Comorbidities
+  const [hypertension, setHypertension] = useState<number>(0);
+  const [diabetes, setDiabetes] = useState<number>(0);
+  const [smoking, setSmoking] = useState<number>(0);
+  const [previousCardiac, setPreviousCardiac] = useState<number>(0);
 
   // Medication history
-  const [statinHistory, setStatinHistory] = useState(0);
-  const [betaBlockerHistory, setBetaBlockerHistory] = useState(0);
-  const [aceArbHistory, setAceArbHistory] = useState(0);
-  const [aspirinHistory, setAspirinHistory] = useState(0);
+  const [statinHistory, setStatinHistory] = useState<number>(0);
+  const [betaBlockerHistory, setBetaBlockerHistory] = useState<number>(0);
+  const [aceArbHistory, setAceArbHistory] = useState<number>(0);
+  const [aspirinHistory, setAspirinHistory] = useState<number>(0);
 
-  const { data: patients } = useQuery({
+  // Patient Cohort query
+  const { data: patients, isLoading: patientsLoading } = useQuery({
     queryKey: ["patients"],
     queryFn: async () => {
       const res = await api.get("/api/v1/patients");
@@ -60,12 +85,12 @@ export default function ClinicalPrediction() {
     if (target) {
       setAge(target.age ?? 60);
       setGender(target.gender ?? 1);
-      setBmi(target.bmi ?? "");
-      setSystolicBp(target.systolic_bp ?? "");
-      setDiastolicBp(target.diastolic_bp ?? "");
-      setGlucose(target.glucose ?? "");
-      setHeartRate(target.heart_rate ?? "");
-      setCholesterol(target.cholesterol ?? "");
+      setBmi(target.bmi ?? 25.0);
+      setSystolicBp(target.systolic_bp ?? 120);
+      setDiastolicBp(target.diastolic_bp ?? 80);
+      setGlucose(target.glucose ?? 90);
+      setHeartRate(target.heart_rate ?? 70);
+      setCholesterol(target.cholesterol ?? 180);
       setAdmissionFrequency(1);
       setMedicationCount(target.medication_count ?? 0);
       setHypertension(target.hypertension ?? 0);
@@ -89,22 +114,7 @@ export default function ClinicalPrediction() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routerPatientId, patients]);
 
-  const shapMetrics = useMemo(() => {
-    if (!inferenceResult) return [];
-    const ageVal = Number(age);
-    const sbpVal = Number(systolicBp) || 120;
-    const glucVal = Number(glucose) || 90;
-    const contributions = [
-      { name: "Chronological Age",           val: ageVal > 50 ? (ageVal - 50) * 0.006 : -0.015,     color: ageVal > 50 ? "bg-rose-400" : "bg-emerald-400" },
-      { name: "Blood Pressure Range",        val: sbpVal > 130 ? (sbpVal - 130) * 0.005 : -0.01,    color: sbpVal > 130 ? "bg-rose-400" : "bg-emerald-400" },
-      { name: "Fasting Glucose Levels",      val: glucVal > 100 ? (glucVal - 100) * 0.004 : -0.008, color: glucVal > 100 ? "bg-rose-400" : "bg-emerald-400" },
-      { name: "Active Tobacco Smoking",      val: smoking === 1 ? 0.065 : -0.015,                   color: smoking === 1 ? "bg-rose-400" : "bg-emerald-400" },
-      { name: "Prior Cardiovascular Events", val: previousCardiac === 1 ? 0.095 : -0.02,            color: previousCardiac === 1 ? "bg-rose-400" : "bg-emerald-400" },
-    ];
-    return contributions.sort((a, b) => Math.abs(b.val) - Math.abs(a.val));
-  }, [inferenceResult, age, systolicBp, glucose, smoking, previousCardiac]);
-
-  // Access guard -- AFTER all hooks
+  // Access restriction guard
   const isAllowed = user?.role === "admin" || user?.role === "doctor";
   if (!isAllowed) {
     return (
@@ -130,12 +140,77 @@ export default function ClinicalPrediction() {
     );
   }
 
+  // Input Validation Logic
+  const validateFormInputs = (): boolean => {
+    const ageNum = Number(age);
+    if (isNaN(ageNum) || ageNum < 18 || ageNum > 120) {
+      toast("Age must be between 18 and 120 years.", "error", "Validation Error");
+      return false;
+    }
+
+    if (bmi !== "" && bmi !== null && bmi !== undefined) {
+      const bmiNum = Number(bmi);
+      if (isNaN(bmiNum) || bmiNum < 10 || bmiNum > 70) {
+        toast("BMI must be between 10.0 and 70.0 kg/m².", "error", "Validation Error");
+        return false;
+      }
+    }
+
+    if (systolicBp !== "" && systolicBp !== null && systolicBp !== undefined) {
+      const sbpNum = Number(systolicBp);
+      if (isNaN(sbpNum) || sbpNum < 70 || sbpNum > 260) {
+        toast("Systolic Blood Pressure must be between 70 and 260 mmHg.", "error", "Validation Error");
+        return false;
+      }
+    }
+
+    if (diastolicBp !== "" && diastolicBp !== null && diastolicBp !== undefined) {
+      const dbpNum = Number(diastolicBp);
+      if (isNaN(dbpNum) || dbpNum < 40 || dbpNum > 180) {
+        toast("Diastolic Blood Pressure must be between 40 and 180 mmHg.", "error", "Validation Error");
+        return false;
+      }
+    }
+
+    if (heartRate !== "" && heartRate !== null && heartRate !== undefined) {
+      const hrNum = Number(heartRate);
+      if (isNaN(hrNum) || hrNum < 30 || hrNum > 220) {
+        toast("Heart Rate must be between 30 and 220 bpm.", "error", "Validation Error");
+        return false;
+      }
+    }
+
+    if (glucose !== "" && glucose !== null && glucose !== undefined) {
+      const glNum = Number(glucose);
+      if (isNaN(glNum) || glNum < 20 || glNum > 800) {
+        toast("Glucose must be between 20 and 800 mg/dL.", "error", "Validation Error");
+        return false;
+      }
+    }
+
+    if (cholesterol !== "" && cholesterol !== null && cholesterol !== undefined) {
+      const chNum = Number(cholesterol);
+      if (isNaN(chNum) || chNum < 50 || chNum > 700) {
+        toast("Cholesterol must be between 50 and 700 mg/dL.", "error", "Validation Error");
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   const handlePredictSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateFormInputs()) {
+      return;
+    }
+
     setIsSubmitting(true);
     setInferenceResult(null);
+
     try {
-      if (inputType === "lookup" && selectedPatientId) {
+      if (inputType === "lookup" && selectedPatientId && !overridePatientValues) {
         const target = patients?.find((p: any) => String(p.patient_id) === selectedPatientId);
         if (target && target.hadm_id) {
           const res = await api.post("/api/v1/predict/admission/" + String(target.hadm_id));
@@ -148,12 +223,12 @@ export default function ClinicalPrediction() {
         const payload = {
           age: Number(age),
           gender: Number(gender),
-          bmi: bmi !== "" ? Number(bmi) : null,
-          systolic_bp: systolicBp !== "" ? Number(systolicBp) : null,
-          diastolic_bp: diastolicBp !== "" ? Number(diastolicBp) : null,
-          glucose: glucose !== "" ? Number(glucose) : null,
-          heart_rate: heartRate !== "" ? Number(heartRate) : null,
-          cholesterol: cholesterol !== "" ? Number(cholesterol) : null,
+          bmi: bmi !== "" && bmi !== null ? Number(bmi) : null,
+          systolic_bp: systolicBp !== "" && systolicBp !== null ? Number(systolicBp) : null,
+          diastolic_bp: diastolicBp !== "" && diastolicBp !== null ? Number(diastolicBp) : null,
+          glucose: glucose !== "" && glucose !== null ? Number(glucose) : null,
+          heart_rate: heartRate !== "" && heartRate !== null ? Number(heartRate) : null,
+          cholesterol: cholesterol !== "" && cholesterol !== null ? Number(cholesterol) : null,
           admission_frequency: Number(admissionFrequency),
           medication_count: Number(medicationCount),
           hypertension: Number(hypertension),
@@ -167,11 +242,20 @@ export default function ClinicalPrediction() {
         };
         const res = await api.post("/api/v1/predict", payload);
         setInferenceResult(res.data);
-        toast("Manual inputs risk estimation calculated successfully.", "success", "Evaluation Complete");
+        toast("Real-time ML risk estimation calculated successfully.", "success", "Evaluation Complete");
       }
+
+      // Refresh Prediction History & Activity queries without full page reload
+      queryClient.invalidateQueries({ queryKey: ["audits"] });
+      queryClient.invalidateQueries({ queryKey: ["prediction_history"] });
+      queryClient.invalidateQueries({ queryKey: ["activities"] });
     } catch (err: any) {
-      const msg = err.response?.data?.detail || "Connection failure with ML Inference Engine.";
-      toast(msg, "error", "Inference Failure");
+      if (err.response?.status === 422) {
+        toast("Invalid clinical parameters provided. Please check numerical bounds.", "error", "Validation Failed");
+      } else {
+        const msg = err.response?.data?.detail || "Prediction service unavailable. Please check backend connections.";
+        toast(msg, "error", "Inference Failure");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -182,89 +266,115 @@ export default function ClinicalPrediction() {
     ? Math.min(1, Math.max(0, inferenceResult.calibrated_probability))
     : 0;
 
-  /**
-   * Centralized risk classification for the Manual Parameter Entry result card.
-   * Single source of truth — all display elements (gauge colour, badge variant,
-   * badge label, recommendation context) derive from this one function.
-   *
-   * Thresholds (ACC/AHA borderline-risk stratification):
-   *   0.000 – 0.049  →  Low Risk      (green)
-   *   0.050 – 0.074  →  Borderline Risk (yellow)
-   *   0.075 – 0.199  →  Moderate Risk  (orange/amber)
-   *   0.200 +        →  High Risk      (red)
-   */
   function classifyRisk(prob: number): {
     label: string;
-    variant: "success" | "warning" | "danger";
+    variant: "success" | "warning" | "danger" | "neutral";
     gaugeColor: string;
     borderColor: string;
   } {
     if (prob < 0.05) {
-      return { label: "Low Risk",       variant: "success", gaugeColor: "#22C55E", borderColor: "border-emerald-200" };
-    } else if (prob < 0.075) {
-      return { label: "Borderline Risk", variant: "warning", gaugeColor: "#EAB308", borderColor: "border-yellow-200" };
+      return { label: "Very Low", variant: "success", gaugeColor: "#10B981", borderColor: "border-emerald-200" };
+    } else if (prob < 0.10) {
+      return { label: "Low", variant: "success", gaugeColor: "#22C55E", borderColor: "border-emerald-300" };
     } else if (prob < 0.20) {
-      return { label: "Moderate Risk",  variant: "warning", gaugeColor: "#F97316", borderColor: "border-orange-200" };
+      return { label: "Moderate", variant: "warning", gaugeColor: "#F59E0B", borderColor: "border-amber-200" };
+    } else if (prob < 0.40) {
+      return { label: "High", variant: "danger", gaugeColor: "#EF4444", borderColor: "border-rose-200" };
     } else {
-      return { label: "High Risk",      variant: "danger",  gaugeColor: "#DC2626", borderColor: "border-rose-200" };
+      return { label: "Very High", variant: "danger", gaugeColor: "#DC2626", borderColor: "border-rose-400" };
     }
   }
 
-  // Derived classification — consistent for every element in the result card
   const riskClass = inferenceResult ? classifyRisk(riskPct) : null;
   const strokeColor = riskClass?.gaugeColor ?? "#22C55E";
 
   const comorbidityFields = [
-    { label: "Essential Hypertension",   val: hypertension,       set: setHypertension },
-    { label: "Type 2 Diabetes Mellitus", val: diabetes,           set: setDiabetes },
-    { label: "Active Tobacco Smoking",   val: smoking,            set: setSmoking },
-    { label: "Prior Cardiac Event",      val: previousCardiac,    set: setPreviousCardiac },
-    { label: "Statin Therapy",           val: statinHistory,      set: setStatinHistory },
-    { label: "Beta Blocker Therapy",     val: betaBlockerHistory, set: setBetaBlockerHistory },
-    { label: "ACE Inhibitor / ARB",      val: aceArbHistory,      set: setAceArbHistory },
-    { label: "Aspirin Therapy",          val: aspirinHistory,     set: setAspirinHistory },
+    { label: "Essential Hypertension", val: hypertension, set: setHypertension },
+    { label: "Type 2 Diabetes Mellitus", val: diabetes, set: setDiabetes },
+    { label: "Active Tobacco Smoking", val: smoking, set: setSmoking },
+    { label: "Prior Cardiac Event", val: previousCardiac, set: setPreviousCardiac },
+    { label: "Statin Therapy", val: statinHistory, set: setStatinHistory },
+    { label: "Beta Blocker Therapy", val: betaBlockerHistory, set: setBetaBlockerHistory },
+    { label: "ACE Inhibitor / ARB", val: aceArbHistory, set: setAceArbHistory },
+    { label: "Aspirin Therapy", val: aspirinHistory, set: setAspirinHistory },
   ];
+
+  const inputsDisabled = inputType === "lookup" && !overridePatientValues;
 
   return (
     <div className="space-y-6">
+      {/* Title */}
       <div>
         <h2 className="text-2xl font-black text-slate-800 tracking-tight">Clinical CHD Prediction Engine</h2>
         <p className="text-xs text-slate-400 font-medium mt-0.5">
-          Real-time cardiovascular risk modeling via Staging CatBoost classification pipeline.
+          Real-time 10-year calibrated Coronary Heart Disease risk inference via trained CatBoost model pipeline.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left: Input Form */}
+        {/* Left Column: Form Deck */}
         <div className="lg:col-span-7 space-y-6">
           <GlassCard className="p-6 space-y-6 bg-white/70">
-            {/* Mode Tab */}
+            {/* Mode Switcher Tab */}
             <div className="flex bg-slate-100/50 p-1.5 rounded-xl gap-2 select-none border border-slate-200/20">
               <button
                 type="button"
-                onClick={() => setInputType("lookup")}
-                className={"flex-1 py-1.5 rounded-lg text-xs font-bold text-center transition cursor-pointer " + (inputType === "lookup" ? "bg-white text-slate-800 shadow" : "text-slate-500 hover:text-slate-800")}
+                onClick={() => {
+                  setInputType("lookup");
+                  setOverridePatientValues(false);
+                }}
+                className={
+                  "flex-1 py-2 rounded-lg text-xs font-extrabold text-center transition cursor-pointer " +
+                  (inputType === "lookup"
+                    ? "bg-white text-slate-800 shadow-sm border border-slate-200/50"
+                    : "text-slate-500 hover:text-slate-800")
+                }
               >
                 ICU Patient Lookup
               </button>
               <button
                 type="button"
-                onClick={() => setInputType("manual")}
-                className={"flex-1 py-1.5 rounded-lg text-xs font-bold text-center transition cursor-pointer " + (inputType === "manual" ? "bg-white text-slate-800 shadow" : "text-slate-500 hover:text-slate-800")}
+                onClick={() => {
+                  setInputType("manual");
+                  setOverridePatientValues(true);
+                }}
+                className={
+                  "flex-1 py-2 rounded-lg text-xs font-extrabold text-center transition cursor-pointer " +
+                  (inputType === "manual"
+                    ? "bg-white text-slate-800 shadow-sm border border-slate-200/50"
+                    : "text-slate-500 hover:text-slate-800")
+                }
               >
                 Manual Parameter Entry
               </button>
             </div>
 
             <form onSubmit={handlePredictSubmit} className="space-y-4">
+              {/* Lookup Selector */}
               {inputType === "lookup" && (
-                <div className="space-y-1.5 p-4 bg-slate-50 border border-slate-100 rounded-2xl">
-                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wide flex items-center gap-1.5">
-                    <Search className="h-3.5 w-3.5" /> Select Patient Admission
-                  </label>
+                <div className="space-y-3 p-4 bg-slate-50/80 border border-slate-200/60 rounded-2xl">
+                  <div className="flex justify-between items-center">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wide flex items-center gap-1.5">
+                      <Search className="h-3.5 w-3.5 text-primary" /> Select Patient Admission
+                    </label>
+                    <label className="flex items-center gap-1.5 text-xs font-bold text-slate-600 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={overridePatientValues}
+                        onChange={(e) => setOverridePatientValues(e.target.checked)}
+                        className="rounded border-slate-300 text-primary h-3.5 w-3.5 focus:ring-primary"
+                      />
+                      <span className="flex items-center gap-1 text-[11px] text-indigo-700">
+                        <Edit3 className="h-3 w-3" /> Override Patient Values
+                      </span>
+                    </label>
+                  </div>
                   <select
                     value={selectedPatientId}
-                    onChange={(e) => { setSelectedPatientId(e.target.value); autoFillPatient(e.target.value); }}
+                    onChange={(e) => {
+                      setSelectedPatientId(e.target.value);
+                      autoFillPatient(e.target.value);
+                    }}
                     className="w-full bg-white border border-slate-200/50 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 outline-none focus:ring-1 focus:ring-primary transition cursor-pointer"
                   >
                     <option value="">Choose patient (ID / HADM ID)...</option>
@@ -274,95 +384,161 @@ export default function ClinicalPrediction() {
                       </option>
                     ))}
                   </select>
+                  {inputType === "lookup" && !overridePatientValues && (
+                    <p className="text-[10px] text-slate-400 font-medium italic">
+                      * Parameters are preloaded from the database. Check "Override Patient Values" to modify fields manually.
+                    </p>
+                  )}
                 </div>
               )}
 
               {/* Vitals Grid */}
               <div className="space-y-3">
                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block pb-1 border-b border-slate-100">
-                  Telemetry Vitals &amp; Labs
+                  Telemetry Vitals &amp; Lab Parameters
                 </span>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[9px] text-slate-500 uppercase font-bold">Age (Years)</label>
-                    <input type="number" value={age} min={0} max={120} step="1" required
-                      onChange={(e) => setAge(Number(e.target.value))}
-                      disabled={inputType === "lookup"}
-                      className="w-full bg-slate-100/50 border border-slate-200/50 rounded-xl px-3 py-2 text-xs font-semibold" />
+                    <label className="text-[9px] text-slate-500 uppercase font-bold flex justify-between">
+                      <span>Age (18–120)</span>
+                      <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      value={age}
+                      min={18}
+                      max={120}
+                      step="1"
+                      required
+                      onChange={(e) => setAge(e.target.value)}
+                      disabled={inputsDisabled}
+                      className="w-full bg-slate-100/50 border border-slate-200/50 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 disabled:opacity-60 disabled:cursor-not-allowed"
+                    />
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-[9px] text-slate-500 uppercase font-bold">Biological Gender</label>
-                    <select value={gender} onChange={(e) => setGender(Number(e.target.value))}
-                      disabled={inputType === "lookup"}
-                      className="w-full bg-slate-100/50 border border-slate-200/50 rounded-xl px-3 py-2 text-xs font-semibold cursor-pointer">
+                    <select
+                      value={gender}
+                      onChange={(e) => setGender(Number(e.target.value))}
+                      disabled={inputsDisabled}
+                      className="w-full bg-slate-100/50 border border-slate-200/50 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
                       <option value={1}>Male</option>
                       <option value={0}>Female</option>
                     </select>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[9px] text-slate-500 uppercase font-bold">BMI</label>
-                    <input type="number" step="0.1" value={bmi} placeholder="Optional"
-                      onChange={(e) => setBmi(e.target.value === "" ? "" : Number(e.target.value))}
-                      disabled={inputType === "lookup"}
-                      className="w-full bg-slate-100/50 border border-slate-200/50 rounded-xl px-3 py-2 text-xs font-semibold" />
+                    <label className="text-[9px] text-slate-500 uppercase font-bold">BMI (10–70)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min={10}
+                      max={70}
+                      value={bmi}
+                      placeholder="e.g. 25.4"
+                      onChange={(e) => setBmi(e.target.value)}
+                      disabled={inputsDisabled}
+                      className="w-full bg-slate-100/50 border border-slate-200/50 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 disabled:opacity-60 disabled:cursor-not-allowed"
+                    />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[9px] text-slate-500 uppercase font-bold">Systolic BP (mmHg)</label>
-                    <input type="number" value={systolicBp} placeholder="Optional"
-                      onChange={(e) => setSystolicBp(e.target.value === "" ? "" : Number(e.target.value))}
-                      disabled={inputType === "lookup"}
-                      className="w-full bg-slate-100/50 border border-slate-200/50 rounded-xl px-3 py-2 text-xs font-semibold" />
+                    <label className="text-[9px] text-slate-500 uppercase font-bold">Systolic BP (70–260)</label>
+                    <input
+                      type="number"
+                      min={70}
+                      max={260}
+                      value={systolicBp}
+                      placeholder="e.g. 120"
+                      onChange={(e) => setSystolicBp(e.target.value)}
+                      disabled={inputsDisabled}
+                      className="w-full bg-slate-100/50 border border-slate-200/50 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 disabled:opacity-60 disabled:cursor-not-allowed"
+                    />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[9px] text-slate-500 uppercase font-bold">Diastolic BP (mmHg)</label>
-                    <input type="number" value={diastolicBp} placeholder="Optional"
-                      onChange={(e) => setDiastolicBp(e.target.value === "" ? "" : Number(e.target.value))}
-                      disabled={inputType === "lookup"}
-                      className="w-full bg-slate-100/50 border border-slate-200/50 rounded-xl px-3 py-2 text-xs font-semibold" />
+                    <label className="text-[9px] text-slate-500 uppercase font-bold">Diastolic BP (40–180)</label>
+                    <input
+                      type="number"
+                      min={40}
+                      max={180}
+                      value={diastolicBp}
+                      placeholder="e.g. 80"
+                      onChange={(e) => setDiastolicBp(e.target.value)}
+                      disabled={inputsDisabled}
+                      className="w-full bg-slate-100/50 border border-slate-200/50 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 disabled:opacity-60 disabled:cursor-not-allowed"
+                    />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[9px] text-slate-500 uppercase font-bold">Glucose (mg/dL)</label>
-                    <input type="number" value={glucose} placeholder="Optional"
-                      onChange={(e) => setGlucose(e.target.value === "" ? "" : Number(e.target.value))}
-                      disabled={inputType === "lookup"}
-                      className="w-full bg-slate-100/50 border border-slate-200/50 rounded-xl px-3 py-2 text-xs font-semibold" />
+                    <label className="text-[9px] text-slate-500 uppercase font-bold">Glucose (20–800)</label>
+                    <input
+                      type="number"
+                      min={20}
+                      max={800}
+                      value={glucose}
+                      placeholder="e.g. 95"
+                      onChange={(e) => setGlucose(e.target.value)}
+                      disabled={inputsDisabled}
+                      className="w-full bg-slate-100/50 border border-slate-200/50 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 disabled:opacity-60 disabled:cursor-not-allowed"
+                    />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[9px] text-slate-500 uppercase font-bold">Heart Rate (bpm)</label>
-                    <input type="number" value={heartRate} placeholder="Optional"
-                      onChange={(e) => setHeartRate(e.target.value === "" ? "" : Number(e.target.value))}
-                      disabled={inputType === "lookup"}
-                      className="w-full bg-slate-100/50 border border-slate-200/50 rounded-xl px-3 py-2 text-xs font-semibold" />
+                    <label className="text-[9px] text-slate-500 uppercase font-bold">Heart Rate (30–220)</label>
+                    <input
+                      type="number"
+                      min={30}
+                      max={220}
+                      value={heartRate}
+                      placeholder="e.g. 72"
+                      onChange={(e) => setHeartRate(e.target.value)}
+                      disabled={inputsDisabled}
+                      className="w-full bg-slate-100/50 border border-slate-200/50 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 disabled:opacity-60 disabled:cursor-not-allowed"
+                    />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[9px] text-slate-500 uppercase font-bold">Cholesterol (mg/dL)</label>
-                    <input type="number" value={cholesterol} placeholder="Optional"
-                      onChange={(e) => setCholesterol(e.target.value === "" ? "" : Number(e.target.value))}
-                      disabled={inputType === "lookup"}
-                      className="w-full bg-slate-100/50 border border-slate-200/50 rounded-xl px-3 py-2 text-xs font-semibold" />
+                    <label className="text-[9px] text-slate-500 uppercase font-bold">Cholesterol (50–700)</label>
+                    <input
+                      type="number"
+                      min={50}
+                      max={700}
+                      value={cholesterol}
+                      placeholder="e.g. 180"
+                      onChange={(e) => setCholesterol(e.target.value)}
+                      disabled={inputsDisabled}
+                      className="w-full bg-slate-100/50 border border-slate-200/50 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 disabled:opacity-60 disabled:cursor-not-allowed"
+                    />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[9px] text-slate-500 uppercase font-bold">Admission Count</label>
-                    <input type="number" value={admissionFrequency} min={0} step="1"
+                    <label className="text-[9px] text-slate-500 uppercase font-bold">ICU Admission Count</label>
+                    <input
+                      type="number"
+                      value={admissionFrequency}
+                      min={0}
+                      step="1"
                       onChange={(e) => setAdmissionFrequency(Number(e.target.value))}
-                      disabled={inputType === "lookup"}
-                      className="w-full bg-slate-100/50 border border-slate-200/50 rounded-xl px-3 py-2 text-xs font-semibold" />
+                      disabled={inputsDisabled}
+                      className="w-full bg-slate-100/50 border border-slate-200/50 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 disabled:opacity-60 disabled:cursor-not-allowed"
+                    />
                   </div>
                 </div>
               </div>
 
-              {/* Comorbidities */}
+              {/* Comorbidities & Medications */}
               <div className="space-y-3 pt-2">
                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block pb-1 border-b border-slate-100">
-                  Comorbidity &amp; Medication History
+                  Comorbidity &amp; Active Medication History
                 </span>
                 <div className="grid grid-cols-2 gap-3">
                   {comorbidityFields.map(({ label, val, set }) => (
-                    <label key={label} className="flex items-center gap-2.5 p-3 bg-slate-50 hover:bg-slate-100/50 rounded-xl border border-slate-100 transition cursor-pointer select-none">
-                      <input type="checkbox" checked={val === 1}
+                    <label
+                      key={label}
+                      className="flex items-center gap-2.5 p-3 bg-slate-50 hover:bg-slate-100/50 rounded-xl border border-slate-100 transition cursor-pointer select-none"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={val === 1}
                         onChange={(e) => set(e.target.checked ? 1 : 0)}
-                        disabled={inputType === "lookup"}
-                        className="rounded border-slate-300 h-4 w-4" />
+                        disabled={inputsDisabled}
+                        className="rounded border-slate-300 text-primary h-4 w-4 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed"
+                      />
                       <span className="text-xs font-extrabold text-slate-600">{label}</span>
                     </label>
                   ))}
@@ -373,7 +549,8 @@ export default function ClinicalPrediction() {
                 type="submit"
                 variant="primary"
                 className="w-full py-3.5 mt-4 text-xs font-black uppercase tracking-wider"
-                disabled={isSubmitting || (inputType === "lookup" && !selectedPatientId)}
+                disabled={isSubmitting || (inputType === "lookup" && !selectedPatientId && !overridePatientValues)}
+                style={{ backgroundColor: "#0F2573", color: "#fff" }}
               >
                 <BrainCircuit className="h-4 w-4 animate-pulse" />
                 <span>{isSubmitting ? "Executing Inference Pipeline..." : "Estimate CHD Adverse Event Risk"}</span>
@@ -382,13 +559,13 @@ export default function ClinicalPrediction() {
           </GlassCard>
         </div>
 
-        {/* Right: Results */}
+        {/* Right Column: Prediction Results Panel */}
         <div className="lg:col-span-5 space-y-6">
-          <GlassCard className="p-6 flex flex-col items-center text-center gap-6 min-h-[500px] relative overflow-hidden bg-white/70">
+          <GlassCard className="p-6 flex flex-col items-center min-h-[550px] relative overflow-hidden bg-white/70">
             {!inferenceResult ? (
-              <div className="my-auto space-y-3 flex flex-col items-center">
+              <div className="my-auto space-y-3 flex flex-col items-center text-center">
                 <div className="h-16 w-16 bg-blue-50/50 rounded-full border border-blue-100/30 flex items-center justify-center text-primary animate-pulse">
-                  <BrainCircuit className="h-8 w-8" />
+                  <BrainCircuit className="h-8 w-8 text-primary" />
                 </div>
                 <h3 className="text-sm font-extrabold text-slate-700 uppercase tracking-wider">Awaiting Estimation</h3>
                 <p className="text-xs text-slate-400 leading-relaxed max-w-[280px]">
@@ -397,14 +574,16 @@ export default function ClinicalPrediction() {
               </div>
             ) : (
               <div className="w-full space-y-6">
-                {/* Gauge */}
+                {/* Gauge & Main Risk Badge */}
                 <div className="flex flex-col items-center gap-2">
                   <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Stratified Risk Outcome</span>
                   <div className="relative h-44 w-44 flex items-center justify-center mt-2">
                     <svg viewBox="0 0 160 160" className="h-full w-full -rotate-90">
                       <circle cx="80" cy="80" r="68" stroke="#F1F5F9" strokeWidth="10" fill="transparent" />
                       <circle
-                        cx="80" cy="80" r="68"
+                        cx="80"
+                        cy="80"
+                        r="68"
                         stroke={strokeColor}
                         strokeWidth="10"
                         fill="transparent"
@@ -421,26 +600,104 @@ export default function ClinicalPrediction() {
                       <span className="text-[8px] font-bold text-slate-400 uppercase block tracking-wider">10-yr CHD risk</span>
                     </div>
                   </div>
+
                   <div className="mt-2 flex items-center gap-2 flex-wrap justify-center">
-                    <GlassBadge variant={riskClass?.variant ?? "success"}>
-                      {riskClass?.label ?? ""}
+                    <GlassBadge variant={riskClass?.variant ?? "success"} className="text-xs px-3 py-1">
+                      {riskClass?.label ?? ""} Risk
                     </GlassBadge>
-                    <span className="text-[9px] text-slate-400 font-semibold">
-                      Raw: {(inferenceResult.raw_probability * 100).toFixed(1)}%
-                    </span>
+                    <GlassBadge variant="neutral" className="text-xs px-3 py-1">
+                      Confidence: {inferenceResult.confidence_score}% ({inferenceResult.confidence_status})
+                    </GlassBadge>
                   </div>
                 </div>
 
-                {/* Latency */}
-                <div className="p-3 bg-slate-50 border border-slate-100 rounded-2xl flex justify-between items-center text-[10px] font-extrabold text-slate-400">
-                  <span className="flex items-center gap-1.5"><Cpu className="h-4 w-4" /> Latency:</span>
-                  <span className="text-slate-700">{inferenceResult.execution_latency_ms.toFixed(1)} ms</span>
+                {/* Dynamic Clinical Interpretation */}
+                <div className="p-3.5 bg-blue-50/50 border border-blue-100 rounded-2xl space-y-1">
+                  <span className="text-[9px] font-extrabold text-blue-700 uppercase tracking-wider block">Clinical Interpretation</span>
+                  <p className="text-xs text-slate-700 font-semibold leading-relaxed">
+                    {inferenceResult.clinical_interpretation}
+                  </p>
                 </div>
 
+                {/* Top Positive & Negative SHAP Contributors */}
+                <div className="space-y-3 text-left pt-2 border-t border-slate-100">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                      <Activity className="h-4 w-4 text-primary" /> Top SHAP Risk Contributors
+                    </span>
+                    <span className="text-[9px] text-slate-400 font-mono">XAI Attributions</span>
+                  </div>
+
+                  {/* Positive Risk Increases */}
+                  {inferenceResult.top_positive_contributors?.length > 0 && (
+                    <div className="space-y-1.5">
+                      <span className="text-[9px] font-bold text-rose-600 uppercase flex items-center gap-1">
+                        <TrendingUp className="h-3 w-3" /> Risk Increases (▲)
+                      </span>
+                      <div className="space-y-1.5">
+                        {inferenceResult.top_positive_contributors.map((contrib: any, idx: number) => (
+                          <div key={idx} className="p-2 bg-rose-50/50 border border-rose-100 rounded-xl text-[10px] space-y-1">
+                            <div className="flex justify-between font-bold text-slate-700">
+                              <span>▲ {contrib.feature}</span>
+                              <span className="text-rose-600 font-mono">{contrib.impact}</span>
+                            </div>
+                            {contrib.detail && <p className="text-[9px] text-slate-400 font-medium">{contrib.detail}</p>}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Negative Risk Protections */}
+                  {inferenceResult.top_negative_contributors?.length > 0 && (
+                    <div className="space-y-1.5 pt-1">
+                      <span className="text-[9px] font-bold text-emerald-600 uppercase flex items-center gap-1">
+                        <TrendingDown className="h-3 w-3" /> Protective Factors (▼)
+                      </span>
+                      <div className="space-y-1.5">
+                        {inferenceResult.top_negative_contributors.map((contrib: any, idx: number) => (
+                          <div key={idx} className="p-2 bg-emerald-50/50 border border-emerald-100 rounded-xl text-[10px] space-y-1">
+                            <div className="flex justify-between font-bold text-slate-700">
+                              <span>▼ {contrib.feature}</span>
+                              <span className="text-emerald-600 font-mono">{contrib.impact}</span>
+                            </div>
+                            {contrib.detail && <p className="text-[9px] text-slate-400 font-medium">{contrib.detail}</p>}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Patient Summary Card */}
+                {inferenceResult.patient_summary && (
+                  <div className="space-y-2 text-left pt-2 border-t border-slate-100">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                      <User className="h-4 w-4 text-slate-500" /> Patient Clinical Profile
+                    </span>
+                    <div className="grid grid-cols-2 gap-2 text-[10px] font-semibold bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                      <div><span className="text-slate-400 block text-[9px]">Age &amp; Gender</span>{inferenceResult.patient_summary.age} yrs • {inferenceResult.patient_summary.gender_str}</div>
+                      <div><span className="text-slate-400 block text-[9px]">Blood Pressure</span>{inferenceResult.patient_summary.bp_str}</div>
+                      <div><span className="text-slate-400 block text-[9px]">BMI</span>{inferenceResult.patient_summary.bmi_str}</div>
+                      <div><span className="text-slate-400 block text-[9px]">Capillary Glucose</span>{inferenceResult.patient_summary.glucose_str}</div>
+                      <div><span className="text-slate-400 block text-[9px]">Heart Rate</span>{inferenceResult.patient_summary.heart_rate_str}</div>
+                      <div><span className="text-slate-400 block text-[9px]">Cholesterol</span>{inferenceResult.patient_summary.cholesterol_str}</div>
+                      <div className="col-span-2 pt-1 border-t border-slate-200/50">
+                        <span className="text-slate-400 block text-[9px]">Comorbidity Risk Factors</span>
+                        <p className="text-slate-700">{inferenceResult.patient_summary.risk_factors.join(", ")}</p>
+                      </div>
+                      <div className="col-span-2">
+                        <span className="text-slate-400 block text-[9px]">Active Medications</span>
+                        <p className="text-slate-700">{inferenceResult.patient_summary.medications.join(", ")}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Recommendations */}
-                <div className="space-y-2 text-left">
+                <div className="space-y-2 text-left pt-2 border-t border-slate-100">
                   <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
-                    <ListCollapse className="h-4 w-4" /> Recommendations ({inferenceResult.recommendations.length})
+                    <ListCollapse className="h-4 w-4" /> Evidence-Based Clinical Guidance ({inferenceResult.recommendations.length})
                   </span>
                   <div className="space-y-2 max-h-[180px] overflow-y-auto pr-1">
                     {inferenceResult.recommendations.length === 0 ? (
@@ -450,7 +707,7 @@ export default function ClinicalPrediction() {
                         <div key={idx} className="p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] space-y-1">
                           <div className="flex justify-between items-center">
                             <span className="font-extrabold text-primary uppercase text-[8px] tracking-wider">{rec.category}</span>
-                            {rec.clinical_justification && <span className="text-[8px] text-slate-400">Justified</span>}
+                            {rec.clinical_justification && <span className="text-[8px] text-slate-400">Guideline Justified</span>}
                           </div>
                           <p className="text-slate-600 font-semibold leading-relaxed">{rec.recommendation_text}</p>
                         </div>
@@ -459,39 +716,30 @@ export default function ClinicalPrediction() {
                   </div>
                 </div>
 
-                {/* Feature Contributions */}
-                <div className="space-y-2 text-left pt-2 border-t border-slate-100">
-                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
-                    <Activity className="h-4 w-4" /> Feature Risk Contributions
-                  </span>
-                  <div className="space-y-2 text-[10px]">
-                    {shapMetrics.map((sm, idx) => (
-                      <div key={idx} className="space-y-1">
-                        <div className="flex justify-between font-bold text-slate-600">
-                          <span>{sm.name}</span>
-                          <span className={sm.val > 0 ? "text-rose-500" : "text-emerald-500"}>
-                            {sm.val > 0
-                              ? "+" + (sm.val * 100).toFixed(1) + "%"
-                              : (sm.val * 100).toFixed(1) + "%"}
-                          </span>
-                        </div>
-                        <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                          <div
-                            className={"h-full rounded-full " + sm.color + " transition-all duration-700"}
-                            style={{ width: String(Math.min(100, Math.abs(sm.val) * 400)) + "%" }}
-                          />
-                        </div>
-                      </div>
-                    ))}
+                {/* Model Details Specs */}
+                {inferenceResult.model_details && (
+                  <div className="p-3 bg-slate-50 border border-slate-100 rounded-2xl space-y-1.5 text-[10px] font-bold text-slate-600 text-left">
+                    <span className="text-[9px] text-slate-400 uppercase block tracking-wider">Model Technical Specs</span>
+                    <div className="grid grid-cols-2 gap-1 text-[9px]">
+                      <div><span className="text-slate-400">Model Name:</span> {inferenceResult.model_details.model_name}</div>
+                      <div><span className="text-slate-400">Version:</span> {inferenceResult.model_details.model_version}</div>
+                      <div><span className="text-slate-400">Calibration:</span> {inferenceResult.model_details.calibration_method}</div>
+                      <div><span className="text-slate-400">ROC-AUC:</span> {(inferenceResult.model_details.validation_roc_auc * 100).toFixed(1)}%</div>
+                      <div><span className="text-slate-400">Latency:</span> {inferenceResult.execution_latency_ms.toFixed(1)} ms</div>
+                      <div><span className="text-slate-400">Training Date:</span> {inferenceResult.model_details.training_date}</div>
+                    </div>
                   </div>
-                </div>
+                )}
 
-                {/* Actions */}
+                {/* Action Controls */}
                 <div className="pt-4 border-t border-slate-100 flex gap-2">
                   <GlassButton
                     variant="secondary"
                     className="flex-1 py-2.5 text-[10px] uppercase font-black"
-                    onClick={() => { window.print(); toast("Report generated for printing.", "success", "Print"); }}
+                    onClick={() => {
+                      window.print();
+                      toast("Report generated for printing.", "success", "Print Summary");
+                    }}
                   >
                     <FileText className="h-4 w-4 text-slate-400" />
                     <span>Print Summary</span>
@@ -499,7 +747,10 @@ export default function ClinicalPrediction() {
                   <GlassButton
                     variant="secondary"
                     className="flex-1 py-2.5 text-[10px] uppercase font-black"
-                    onClick={() => { setInferenceResult(null); toast("Ready for new prediction.", "info", "Reset"); }}
+                    onClick={() => {
+                      setInferenceResult(null);
+                      toast("Ready for new prediction.", "info", "Reset Form");
+                    }}
                   >
                     <BrainCircuit className="h-4 w-4 text-slate-400" />
                     <span>New Prediction</span>

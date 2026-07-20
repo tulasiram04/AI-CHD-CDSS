@@ -162,14 +162,14 @@ class PendingRequestAction(BaseModel):
 
 # Prediction schemas
 class PredictionRequest(BaseModel):
-    age: float = Field(..., ge=0, le=120)
+    age: float = Field(..., ge=18, le=120, description="Age in years (18-120)")
     gender: int = Field(..., ge=0, le=1, description="0: Female, 1: Male")
-    bmi: Optional[float] = Field(None, ge=10, le=80)
-    systolic_bp: Optional[float] = Field(None, ge=50, le=250)
-    diastolic_bp: Optional[float] = Field(None, ge=30, le=150)
-    glucose: Optional[float] = Field(None, ge=20, le=1000)
-    heart_rate: Optional[float] = Field(None, ge=30, le=220)
-    cholesterol: Optional[float] = Field(None, ge=50, le=600)
+    bmi: Optional[float] = Field(None, ge=10, le=70, description="Body Mass Index (10-70)")
+    systolic_bp: Optional[float] = Field(None, ge=70, le=260, description="Systolic BP (70-260 mmHg)")
+    diastolic_bp: Optional[float] = Field(None, ge=40, le=180, description="Diastolic BP (40-180 mmHg)")
+    glucose: Optional[float] = Field(None, ge=20, le=800, description="Glucose (20-800 mg/dL)")
+    heart_rate: Optional[float] = Field(None, ge=30, le=220, description="Heart rate (30-220 bpm)")
+    cholesterol: Optional[float] = Field(None, ge=50, le=700, description="Cholesterol (50-700 mg/dL)")
     admission_frequency: int = Field(default=1, ge=0)
     medication_count: int = Field(default=0, ge=0)
     hypertension: int = Field(default=0, ge=0, le=1)
@@ -186,13 +186,46 @@ class RecommendationItem(BaseModel):
     recommendation_text: str
     clinical_justification: Optional[str] = None
 
+class TopContributorItem(BaseModel):
+    feature: str
+    impact: str
+    direction: str  # "positive" or "negative"
+    detail: Optional[str] = None
+    value: float
+
+class PatientSummaryInfo(BaseModel):
+    age: float
+    gender_str: str
+    bmi_str: str
+    bp_str: str
+    heart_rate_str: str
+    glucose_str: str
+    cholesterol_str: str
+    risk_factors: List[str]
+    medications: List[str]
+
+class ModelMetadataDetails(BaseModel):
+    model_name: str
+    model_version: str
+    training_date: str
+    calibration_method: str
+    inference_time_ms: float
+    validation_roc_auc: float
+
 class PredictionResponse(BaseModel):
     prediction_uuid: str
     patient_uuid: Optional[str] = None
     raw_probability: float
     calibrated_probability: float
     risk_level: str
+    confidence_score: float
+    confidence_status: str
+    clinical_interpretation: str
     recommendations: List[RecommendationItem]
+    top_positive_contributors: List[TopContributorItem]
+    top_negative_contributors: List[TopContributorItem]
+    patient_summary: PatientSummaryInfo
+    model_details: ModelMetadataDetails
     execution_latency_ms: float
 
 # Governance schemas
