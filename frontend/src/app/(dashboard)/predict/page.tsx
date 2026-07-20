@@ -274,16 +274,16 @@ export default function ClinicalPrediction() {
     gaugeColor: string;
     borderColor: string;
   } {
-    if (prob < 0.05) {
-      return { label: "Very Low", variant: "success", gaugeColor: "#10B981", borderColor: "border-emerald-200" };
-    } else if (prob < 0.10) {
-      return { label: "Low", variant: "success", gaugeColor: "#22C55E", borderColor: "border-emerald-300" };
-    } else if (prob < 0.20) {
-      return { label: "Moderate", variant: "warning", gaugeColor: "#F59E0B", borderColor: "border-amber-200" };
-    } else if (prob < 0.40) {
-      return { label: "High", variant: "danger", gaugeColor: "#EF4444", borderColor: "border-rose-200" };
+    if (prob < 0.10) {
+      return { label: "Very Low Risk", variant: "success", gaugeColor: "#10B981", borderColor: "border-emerald-200" };
+    } else if (prob < 0.25) {
+      return { label: "Low Risk", variant: "success", gaugeColor: "#22C55E", borderColor: "border-emerald-300" };
+    } else if (prob < 0.50) {
+      return { label: "Moderate Risk", variant: "warning", gaugeColor: "#F59E0B", borderColor: "border-amber-200" };
+    } else if (prob < 0.75) {
+      return { label: "High Risk", variant: "danger", gaugeColor: "#EF4444", borderColor: "border-rose-200" };
     } else {
-      return { label: "Very High", variant: "danger", gaugeColor: "#DC2626", borderColor: "border-rose-400" };
+      return { label: "Very High Risk", variant: "danger", gaugeColor: "#DC2626", borderColor: "border-rose-400" };
     }
   }
 
