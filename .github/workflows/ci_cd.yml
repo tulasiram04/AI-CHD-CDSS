@@ -9,12 +9,14 @@ on:
 jobs:
   backend-test:
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python 3.12
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
@@ -24,9 +26,12 @@ jobs:
           pip install -r requirements.txt
           pip install pytest pytest-cov black flake8
 
-      - name: Lint with black & flake8
+      - name: Format Check with Black
         run: |
           black --check backend/
+
+      - name: Lint Syntax with Flake8
+        run: |
           flake8 backend/ --count --select=E9,F63,F7,F82 --show-source --statistics
 
       - name: Run Backend Pytest suite
@@ -37,10 +42,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js 20
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: 'npm'
@@ -51,12 +56,12 @@ jobs:
           cd frontend
           npm ci
 
-      - name: Run ESLint
+      - name: Build Next.js Production Bundle
         run: |
           cd frontend
-          npm run lint
+          npm run build
 
-      - name: Run Unit Tests
+      - name: Run Frontend Unit Tests
         run: |
           cd frontend
           node --test tests/frontend.test.js
@@ -65,8 +70,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Validate Docker Compose syntax
+      - name: Prepare Environment Files for Docker
+        run: |
+          cp .env.example .env.production
+          cp .env.example .env
+
+      - name: Validate Docker Compose Syntax
         run: |
           docker compose config
