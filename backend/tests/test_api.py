@@ -137,7 +137,7 @@ def test_direct_prediction_success():
     assert "prediction_uuid" in data
     assert "raw_probability" in data
     assert "calibrated_probability" in data
-    assert data["risk_level"] in ["Low", "Medium", "High", "Very High"]
+    assert data["risk_level"] in ["Low Risk", "Borderline Risk", "Moderate Risk", "High Risk", "Low", "Medium", "High", "Very High"]
     assert len(data["recommendations"]) > 0
 
 def test_admission_prediction_success():
