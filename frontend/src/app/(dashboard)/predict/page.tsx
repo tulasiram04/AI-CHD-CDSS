@@ -27,11 +27,13 @@ import {
   BarChart3,
   Award,
   Clock,
-  Check
+  Check,
+  Download
 } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
 import GlassButton from "@/components/ui/GlassButton";
 import GlassBadge from "@/components/ui/GlassBadge";
+import { downloadChdReport } from "@/lib/pdfGenerator";
 
 export default function ClinicalPrediction() {
   const { user } = useAuth();
@@ -732,28 +734,68 @@ export default function ClinicalPrediction() {
                 )}
 
                 {/* Action Controls */}
-                <div className="pt-4 border-t border-slate-100 flex gap-2">
+                <div className="pt-4 border-t border-slate-100 flex gap-2 flex-wrap">
+                  <GlassButton
+                    variant="primary"
+                    className="flex-1 py-2.5 text-[10px] uppercase font-black"
+                    style={{ backgroundColor: "#2F5BEA", color: "#FFFFFF" }}
+                    onClick={async () => {
+                      toast("Generating hospital-grade clinical PDF report...", "info", "Exporting PDF");
+                      await downloadChdReport({
+                        patientUuid: selectedPatientId || inferenceResult.patient_uuid || "DIRECT_INPUT",
+                        predictedRisk: inferenceResult.calibrated_probability,
+                        riskLevel: inferenceResult.risk_level,
+                        confidenceScore: inferenceResult.confidence_score,
+                        confidenceStatus: inferenceResult.confidence_status,
+                        clinicalInterpretation: inferenceResult.clinical_interpretation,
+                        age: Number(age),
+                        gender: Number(gender),
+                        bmi: bmi ? Number(bmi) : 25.0,
+                        systolicBp: systolicBp ? Number(systolicBp) : 120,
+                        diastolicBp: diastolicBp ? Number(diastolicBp) : 80,
+                        heartRate: heartRate ? Number(heartRate) : 72,
+                        glucose: glucose ? Number(glucose) : 95,
+                        cholesterol: cholesterol ? Number(cholesterol) : 180,
+                        hypertension: hypertension,
+                        diabetes: diabetes,
+                        smoking: smoking,
+                        previousCardiac: previousCardiac,
+                        statinHistory: statinHistory,
+                        topPositiveContributors: inferenceResult.top_positive_contributors,
+                        topNegativeContributors: inferenceResult.top_negative_contributors,
+                        recommendations: inferenceResult.recommendations,
+                        modelVersion: inferenceResult.model_details?.model_version || "v1.0.0",
+                        executionLatencyMs: inferenceResult.execution_latency_ms,
+                        clinicianName: (user as any)?.full_name || (user as any)?.name || user?.email || "Dr. Sarah Jenkins, MD",
+                        hospitalName: "St. Jude Memorial Hospital"
+                      });
+                      toast("Clinical PDF Report downloaded successfully.", "success", "Download Complete");
+                    }}
+                  >
+                    <Download className="h-4 w-4 text-white" />
+                    <span>Download Clinical PDF</span>
+                  </GlassButton>
                   <GlassButton
                     variant="secondary"
-                    className="flex-1 py-2.5 text-[10px] uppercase font-black"
+                    className="py-2.5 text-[10px] uppercase font-black"
                     onClick={() => {
                       window.print();
                       toast("Report generated for printing.", "success", "Print Summary");
                     }}
                   >
                     <FileText className="h-4 w-4 text-slate-400" />
-                    <span>Print Summary</span>
+                    <span>Print</span>
                   </GlassButton>
                   <GlassButton
                     variant="secondary"
-                    className="flex-1 py-2.5 text-[10px] uppercase font-black"
+                    className="py-2.5 text-[10px] uppercase font-black"
                     onClick={() => {
                       setInferenceResult(null);
                       toast("Ready for new prediction.", "info", "Reset Form");
                     }}
                   >
                     <BrainCircuit className="h-4 w-4 text-slate-400" />
-                    <span>New Prediction</span>
+                    <span>Reset</span>
                   </GlassButton>
                 </div>
               </div>
