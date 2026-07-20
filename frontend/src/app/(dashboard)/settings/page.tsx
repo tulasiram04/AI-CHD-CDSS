@@ -975,9 +975,14 @@ export default function ProfileSettings() {
 
           {/* Activity Timeline logs */}
           <GlassCard className="p-6 space-y-4 bg-white/70">
-            <div className="flex items-center gap-2 pb-2 border-b border-brand-light/30">
-              <History className="h-5 w-5 text-primary" />
-              <h4 className="text-xs font-bold text-text-main uppercase tracking-wider">Clinician Portal Audit Trail</h4>
+            <div className="flex items-center justify-between pb-2 border-b border-brand-light/30">
+              <div className="flex items-center gap-2">
+                <History className="h-5 w-5 text-primary" />
+                <h4 className="text-xs font-bold text-text-main uppercase tracking-wider">Clinician Portal Audit Trail</h4>
+              </div>
+              <span className="text-[10px] font-extrabold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                Last 5 Updates
+              </span>
             </div>
 
             {isActivityLoading ? (
@@ -986,7 +991,7 @@ export default function ProfileSettings() {
               <p className="text-xs text-text-muted font-bold text-center py-4">No recent portal activities recorded.</p>
             ) : (
               <div className="relative pl-6 border-l border-brand-light/40 ml-2.5 space-y-5 text-xs font-semibold text-text-main">
-                {activityLogs.map((log: any) => (
+                {activityLogs.slice(0, 5).map((log: any) => (
                   <div key={log.id} className="relative">
                     <div style={{ left: "-31px" }} className="absolute top-1 h-3.5 w-3.5 rounded-full bg-primary border-2 border-white shadow-xs flex items-center justify-center">
                       <div className="h-1 w-1 bg-white rounded-full" />

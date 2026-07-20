@@ -333,11 +333,11 @@ def update_password(
 
 @router.get("/activity", response_model=List[ActivityResponse])
 def get_activity(
-    limit: int = 20,
+    limit: int = 5,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Return the most recent activity logs for the current user."""
+    """Return the 5 most recent activity logs for the current user."""
     logs = (
         db.query(ActivityLog)
         .filter(ActivityLog.user_id == current_user.id)
