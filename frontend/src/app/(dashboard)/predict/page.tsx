@@ -680,12 +680,12 @@ export default function ClinicalPrediction() {
                     <span className="text-[9px] text-slate-400 font-mono">TreeExplainer Attributions</span>
                   </div>
 
-                  {/* Positive Risk Increases */}
-                  {inferenceResult.top_positive_contributors?.length > 0 && (
-                    <div className="space-y-1.5">
-                      <span className="text-[9px] font-bold text-rose-600 uppercase flex items-center gap-1">
-                        <TrendingUp className="h-3 w-3" /> Risk Increases (▲)
-                      </span>
+                  {/* Risk Increasing Factors */}
+                  <div className="space-y-1.5">
+                    <span className="text-[9px] font-bold text-rose-600 uppercase flex items-center gap-1">
+                      <TrendingUp className="h-3 w-3" /> Risk Increasing Factors (▲)
+                    </span>
+                    {inferenceResult.top_positive_contributors?.length > 0 ? (
                       <div className="space-y-1.5">
                         {inferenceResult.top_positive_contributors.map((contrib: any, idx: number) => (
                           <div key={idx} className="p-2 bg-rose-50/50 border border-rose-100 rounded-xl text-[10px] space-y-1">
@@ -699,22 +699,27 @@ export default function ClinicalPrediction() {
                           </div>
                         ))}
                       </div>
-                    </div>
-                  )}
+                    ) : (
+                      <div className="p-2.5 bg-emerald-50/40 border border-emerald-100 rounded-xl text-[10px] font-semibold text-emerald-800 flex items-center justify-between">
+                        <span>No significant clinical risk factors identified.</span>
+                        <span className="text-[9px] font-mono text-emerald-600 font-bold">Optimal Baseline</span>
+                      </div>
+                    )}
+                  </div>
 
-                  {/* Negative Risk Protections */}
+                  {/* Protective Factors */}
                   {inferenceResult.top_negative_contributors?.length > 0 && (
                     <div className="space-y-1.5 pt-1">
                       <span className="text-[9px] font-bold text-emerald-600 uppercase flex items-center gap-1">
                         <TrendingDown className="h-3 w-3" /> Protective Factors (▼)
                       </span>
-                      <div className="space-y-1.5">
+                      <div className="space-y-1.5 max-h-[200px] overflow-y-auto pr-1">
                         {inferenceResult.top_negative_contributors.map((contrib: any, idx: number) => (
                           <div key={idx} className="p-2 bg-emerald-50/50 border border-emerald-100 rounded-xl text-[10px] space-y-1">
                             <div className="flex justify-between font-bold text-slate-700">
-                              <span>▼ {contrib.feature} ({contrib.actual_value || contrib.detail})</span>
+                              <span>▼ {contrib.feature}</span>
                               <div className="flex items-center gap-1.5">
-                                <span className="text-[8px] bg-emerald-200/60 text-emerald-800 px-1.5 py-0.5 rounded font-extrabold">{contrib.importance_level || "Protective"}</span>
+                                <span className="text-[8px] bg-emerald-200/60 text-emerald-800 px-1.5 py-0.5 rounded font-extrabold">Protective</span>
                                 <span className="text-emerald-600 font-mono font-black">{contrib.impact}</span>
                               </div>
                             </div>

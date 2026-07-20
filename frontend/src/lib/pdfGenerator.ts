@@ -30,8 +30,8 @@ export interface ChdReportData {
   betaBlockerHistory?: boolean | number;
   aceArbHistory?: boolean | number;
   aspirinHistory?: boolean | number;
-  topPositiveContributors?: Array<{ feature: string; impact: string; detail?: string }>;
-  topNegativeContributors?: Array<{ feature: string; impact: string; detail?: string }>;
+  topPositiveContributors?: Array<{ feature: string; impact: string; detail?: string; actual_value?: string }>;
+  topNegativeContributors?: Array<{ feature: string; impact: string; detail?: string; actual_value?: string }>;
   recommendations?: Array<{ category: string; recommendation_text: string; clinical_justification?: string }>;
   modelVersion?: string;
   executionLatencyMs?: number;
@@ -359,19 +359,16 @@ export async function downloadChdReport(data: ChdReportData) {
 
   y = (doc as any).lastAutoTable.finalY + 6;
 
-  // --- Section 6: Explainable AI (SHAP Risk Attributions) ---
-  y = drawSectionHeader(doc, y, "Explainable AI (SHAP Feature Risk Attributions)");
+  // --- Section 6: Explainable AI (SHAP Feature Risk Attributions) ---
+  y = drawSectionHeader(doc, y, "Explainable AI (Risk Increasing & Protective Attributions)");
 
-  const posRows = data.topPositiveContributors?.map(p => [`▲ ${p.feature}`, "Risk Increase", p.impact, p.detail || "Elevated"]) || [
-    ["▲ Age Group", "Risk Increase", "+5.4%", `Age: ${ageVal} yrs`],
-    ["▲ Systolic Blood Pressure", "Risk Increase", "+4.1%", `BP: ${bpVal}`],
-    ["▲ Essential Hypertension", "Risk Increase", "+3.2%", "Positive Clinical History"]
-  ];
+  const posRows = (data.topPositiveContributors && data.topPositiveContributors.length > 0)
+    ? data.topPositiveContributors.map(p => [`▲ ${p.feature}`, "Risk Increasing Factor", p.impact, p.detail || `Actual Value: ${p.actual_value || 'Abnormal'}`])
+    : [["▲ Risk Increasing Factors", "Optimal Baseline", "0.0%", "No significant clinical risk factors identified."]];
 
-  const negRows = data.topNegativeContributors?.map(n => [`▼ ${n.feature}`, "Protective Factor", n.impact, n.detail || "Active"]) || [
-    ["▼ Statin Therapy", "Protective Factor", "-2.6%", data.statinHistory ? "Active Prescription" : "Naïve"],
-    ["▼ Resting Heart Rate", "Protective Factor", "-1.2%", `HR: ${hrVal}`]
-  ];
+  const negRows = (data.topNegativeContributors && data.topNegativeContributors.length > 0)
+    ? data.topNegativeContributors.map(n => [`▼ ${n.feature}`, "Protective Factor", n.impact, n.detail || `Healthy Status`])
+    : [["▼ Protective Factors", "Protective Factor", "0.0%", "Baseline physiological parameters within normal limits."]];
 
   autoTable(doc, {
     startY: y,

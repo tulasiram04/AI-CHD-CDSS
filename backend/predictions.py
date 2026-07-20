@@ -425,6 +425,75 @@ def classify_risk_level(prob: float) -> str:
         return "Very High Risk"
 
 
+def is_clinically_abnormal(base_col: str, raw_val: Any) -> bool:
+    """Returns True ONLY if a feature value is clinically abnormal/risk-increasing."""
+    if raw_val is None:
+        return False
+    col = base_col.lower().strip()
+    try:
+        if col == "age":
+            return float(raw_val) >= 60.0
+        elif col == "bmi":
+            return float(raw_val) >= 25.0
+        elif col == "systolic_bp":
+            return float(raw_val) >= 130.0
+        elif col == "diastolic_bp":
+            return float(raw_val) >= 85.0
+        elif col == "glucose":
+            return float(raw_val) >= 100.0
+        elif col == "cholesterol":
+            return float(raw_val) >= 200.0
+        elif col == "heart_rate":
+            return float(raw_val) >= 100.0 or float(raw_val) < 50.0
+        elif col in ["admission_frequency", "icu_admission_count"]:
+            return float(raw_val) > 0
+        elif col == "comorbidity_burden":
+            return float(raw_val) > 0
+        elif col in ["hypertension", "diabetes", "previous_cardiac", "smoking"]:
+            return int(raw_val) == 1
+    except (ValueError, TypeError):
+        pass
+    return False
+
+
+def get_protective_label(base_col: str, raw_val: Any) -> str:
+    """Generates clinically accurate protective factor label."""
+    col = base_col.lower().strip()
+    if col == "age" and raw_val is not None:
+        return f"Young age ({raw_val} years)" if float(raw_val) < 45 else f"Non-elevated age ({raw_val} years)"
+    elif col == "gender" and raw_val is not None:
+        return "Female gender" if int(raw_val) == 0 else "Male gender"
+    elif col == "systolic_bp" and raw_val is not None:
+        return f"Normal blood pressure ({raw_val} mmHg)"
+    elif col == "diastolic_bp" and raw_val is not None:
+        return f"Normal diastolic pressure ({raw_val} mmHg)"
+    elif col == "glucose" and raw_val is not None:
+        return f"Normal glucose ({raw_val} mg/dL)"
+    elif col == "cholesterol" and raw_val is not None:
+        return f"Healthy cholesterol ({raw_val} mg/dL)"
+    elif col == "bmi" and raw_val is not None:
+        return f"Healthy BMI ({raw_val} kg/m²)"
+    elif col in ["admission_frequency", "icu_admission_count"]:
+        return "Zero ICU admissions"
+    elif col == "hypertension":
+        return "No hypertension"
+    elif col == "diabetes":
+        return "No diabetes"
+    elif col == "smoking":
+        return "No smoking"
+    elif col == "previous_cardiac":
+        return "No previous cardiac event"
+    elif col == "statin_history":
+        return "Statin therapy active" if raw_val == 1 else "No statin therapy required"
+    elif col == "beta_blocker_history":
+        return "Beta blocker therapy active" if raw_val == 1 else "No beta blocker therapy required"
+    elif col == "ace_arb_history":
+        return "ACE Inhibitor / ARB active" if raw_val == 1 else "No ACE/ARB therapy required"
+    elif col == "aspirin_history":
+        return "Aspirin therapy active" if raw_val == 1 else "No aspirin therapy required"
+    return f"Normal {base_col.replace('_', ' ').title()}"
+
+
 def compute_shap_and_contributors(model, df_model_input: pd.DataFrame, raw_inputs: dict) -> tuple:
     """Computes real feature contribution SHAP scores for positive and negative risk factors."""
     positive_contribs = []
@@ -475,7 +544,7 @@ def compute_shap_and_contributors(model, df_model_input: pd.DataFrame, raw_input
         for col, val in zip(cols, shap_vec):
             base_col = col.replace("_0", "").replace("_1", "").replace("_missing", "")
             label = feature_labels.get(base_col, col.replace("_", " ").title())
-            items.append((label, float(val), raw_inputs.get(base_col, None)))
+            items.append((base_col, label, float(val), raw_inputs.get(base_col, None)))
     else:
         importances = getattr(getattr(model, "model", model), "feature_importances_", None)
         if importances is not None and len(importances) == len(cols):
@@ -483,19 +552,20 @@ def compute_shap_and_contributors(model, df_model_input: pd.DataFrame, raw_input
                 base_col = col.replace("_0", "").replace("_1", "").replace("_missing", "")
                 label = feature_labels.get(base_col, col.replace("_", " ").title())
                 raw_val = raw_inputs.get(base_col, 0)
-                is_pos = True
-                if base_col in ["statin_history", "beta_blocker_history", "ace_arb_history", "aspirin_history"]:
-                    is_pos = (raw_val == 0)
+                is_pos = is_clinically_abnormal(base_col, raw_val)
                 val = (imp / 100.0) if is_pos else -(imp / 100.0)
-                items.append((label, float(val), raw_val))
+                items.append((base_col, label, float(val), raw_val))
 
-    pos_items = [it for it in items if it[1] > 0.0001]
-    neg_items = [it for it in items if it[1] < -0.0001]
+    # STRICT SEPARATION:
+    # 1. Positives (Risk Increasing Factors): MUST have positive SHAP AND be clinically abnormal!
+    pos_items = [it for it in items if it[2] > 0.0001 and is_clinically_abnormal(it[0], it[3])]
+    pos_items.sort(key=lambda x: x[2], reverse=True)
 
-    pos_items.sort(key=lambda x: x[1], reverse=True)
-    neg_items.sort(key=lambda x: x[1])
+    # 2. Negatives (Protective Factors): Features with SHAP <= 0 OR is_clinically_abnormal == False
+    neg_items = [it for it in items if it[2] <= 0.0001 or not is_clinically_abnormal(it[0], it[3])]
+    neg_items.sort(key=lambda x: x[2])  # Most negative / healthiest first
 
-    for label, val, raw_v in pos_items[:5]:
+    for base_col, label, val, raw_v in pos_items[:5]:
         val_abs = abs(val)
         if val_abs > 0.15:
             imp_lvl = "Very High Impact"
@@ -509,6 +579,7 @@ def compute_shap_and_contributors(model, df_model_input: pd.DataFrame, raw_input
         raw_str = f"{raw_v}" if raw_v is not None else "Present"
         if label == "Age": raw_str = f"{raw_v} Years"
         elif label == "Systolic BP": raw_str = f"{raw_v} mmHg"
+        elif label == "Diastolic BP": raw_str = f"{raw_v} mmHg"
         elif label == "Serum Cholesterol": raw_str = f"{raw_v} mg/dL"
         elif label == "Fasting Glucose": raw_str = f"{raw_v} mg/dL"
         elif label == "BMI": raw_str = f"{raw_v} kg/m²"
@@ -519,23 +590,21 @@ def compute_shap_and_contributors(model, df_model_input: pd.DataFrame, raw_input
             impact=f"+{(val_abs*100):.1f}%",
             direction="positive",
             importance_level=imp_lvl,
-            detail=f"Clinical Value: {raw_str}",
+            detail=f"Abnormal clinical parameter: {raw_str}",
             value=val
         ))
 
-    for label, val, raw_v in neg_items[:5]:
+    for base_col, label, val, raw_v in neg_items[:10]:
         val_abs = abs(val)
-        raw_str = f"{raw_v}" if raw_v is not None else "Active"
-        if raw_v == 1: raw_str = "Present"
-        elif raw_v == 0: raw_str = "Controlled"
+        prot_label = get_protective_label(base_col, raw_v)
 
         negative_contribs.append(TopContributorItem(
-            feature=label,
-            actual_value=raw_str,
+            feature=prot_label,
+            actual_value=str(raw_v) if raw_v is not None else "Normal",
             impact=f"-{(val_abs*100):.1f}%",
             direction="negative",
             importance_level="Protective",
-            detail=f"Protective factor ({raw_str})",
+            detail=f"Protective / Healthy status ({prot_label})",
             value=val
         ))
 
@@ -621,43 +690,89 @@ def compute_structured_interpretation(risk_lvl: str, prob: float, raw_inputs: di
     prob_pct = f"{(prob * 100):.1f}%"
     
     majors = []
-    if raw_inputs.get("age", 0) >= 65: majors.append("Advanced age")
-    if (raw_inputs.get("systolic_bp") and raw_inputs["systolic_bp"] >= 140) or raw_inputs.get("hypertension") == 1: majors.append("Hypertension")
-    if raw_inputs.get("diabetes") == 1 or (raw_inputs.get("glucose") and raw_inputs["glucose"] >= 140): majors.append("Type 2 Diabetes")
-    if raw_inputs.get("cholesterol") and raw_inputs["cholesterol"] >= 240: majors.append("Hypercholesterolemia")
-    if raw_inputs.get("smoking") == 1: majors.append("Active Tobacco Smoking")
-    if raw_inputs.get("previous_cardiac") == 1: majors.append("Prior Cardiac Event")
-    if not majors:
-        for c in pos_contribs[:3]: majors.append(c.feature)
+    if raw_inputs.get("age", 0) >= 60:
+        majors.append(f"advanced age ({raw_inputs['age']} years)")
+    if raw_inputs.get("systolic_bp") and raw_inputs["systolic_bp"] >= 130:
+        majors.append(f"uncontrolled hypertension ({int(raw_inputs['systolic_bp'])} mmHg)")
+    elif raw_inputs.get("hypertension") == 1:
+        majors.append("hypertension")
+    if raw_inputs.get("diabetes") == 1:
+        majors.append("diabetes mellitus")
+    elif raw_inputs.get("glucose") and raw_inputs["glucose"] >= 100:
+        majors.append(f"elevated glucose ({int(raw_inputs['glucose'])} mg/dL)")
+    if raw_inputs.get("cholesterol") and raw_inputs["cholesterol"] >= 200:
+        majors.append(f"elevated cholesterol ({int(raw_inputs['cholesterol'])} mg/dL)")
+    if raw_inputs.get("bmi") and raw_inputs["bmi"] >= 25.0:
+        majors.append(f"obesity / elevated BMI ({raw_inputs['bmi']:.1f} kg/m²)")
+    if raw_inputs.get("smoking") == 1:
+        majors.append("active tobacco smoking")
+    if raw_inputs.get("previous_cardiac") == 1:
+        majors.append("previous cardiac disease")
+    if raw_inputs.get("admission_frequency", 0) > 0:
+        majors.append(f"ICU admissions ({raw_inputs['admission_frequency']})")
         
+    if not majors:
+        majors = ["no significant clinical risk factors identified"]
+
     protects = []
-    if raw_inputs.get("statin_history") == 1: protects.append("Statin Therapy")
-    if raw_inputs.get("beta_blocker_history") == 1: protects.append("Beta Blocker Therapy")
-    if raw_inputs.get("ace_arb_history") == 1: protects.append("ACE Inhibitor / ARB")
-    if raw_inputs.get("aspirin_history") == 1: protects.append("Aspirin Therapy")
-    if not protects: protects.append("None Documented Active")
-    
-    if prob >= 0.75:
-        assessment = f"Patient demonstrates multiple major cardiovascular risk factors consistent with a Very High probability ({prob_pct}) of future Coronary Heart Disease."
-        concern = "Immediate Cardiology Evaluation Recommended"
-        followup = "Schedule 12-lead ECG, Troponin / Cardiac Biomarker panel, and urgent Cardiology appointment within 48 hours."
+    if raw_inputs.get("age") and raw_inputs["age"] < 45:
+        protects.append(f"young age ({raw_inputs['age']} years)")
+    if raw_inputs.get("gender") == 0:
+        protects.append("female gender")
+    if raw_inputs.get("systolic_bp") and raw_inputs["systolic_bp"] < 120 and raw_inputs.get("diastolic_bp") and raw_inputs["diastolic_bp"] < 80:
+        protects.append(f"normal blood pressure ({int(raw_inputs['systolic_bp'])}/{int(raw_inputs['diastolic_bp'])} mmHg)")
+    if raw_inputs.get("glucose") and raw_inputs["glucose"] < 100:
+        protects.append(f"normal glucose ({int(raw_inputs['glucose'])} mg/dL)")
+    if raw_inputs.get("cholesterol") and raw_inputs["cholesterol"] < 200:
+        protects.append(f"healthy cholesterol ({int(raw_inputs['cholesterol'])} mg/dL)")
+    if raw_inputs.get("bmi") and 18.5 <= raw_inputs["bmi"] < 25.0:
+        protects.append(f"healthy BMI ({raw_inputs['bmi']:.1f} kg/m²)")
+    if raw_inputs.get("smoking") == 0:
+        protects.append("no smoking")
+    if raw_inputs.get("diabetes") == 0:
+        protects.append("no diabetes")
+    if raw_inputs.get("hypertension") == 0:
+        protects.append("no hypertension")
+    if raw_inputs.get("previous_cardiac") == 0:
+        protects.append("no previous cardiac event")
+    if raw_inputs.get("admission_frequency", 0) == 0:
+        protects.append("no ICU admissions")
+
+    if not protects:
+        protects = ["standard baseline physiological parameters"]
+
+    if prob < 0.05:
+        assessment = (
+            f"The patient demonstrates a very low estimated 10-year CHD risk ({prob_pct}). "
+            f"This is primarily due to {', '.join(protects)}."
+        )
+        concern = "Low Clinical Concern — Routine Health Maintenance"
+        followup = "Continue lifestyle health maintenance, low-sodium nutrition, and routine annual health screening."
     elif prob >= 0.50:
-        assessment = f"Patient demonstrates significant cumulative cardiovascular risk factors with a High probability ({prob_pct}) of Coronary Heart Disease."
-        concern = "Urgent Outpatient Cardiology Evaluation"
-        followup = "Schedule Lipid Profile, HbA1c, 12-lead ECG, and Specialist Cardiology appointment within 7-14 days."
+        assessment = (
+            f"The elevated CHD risk ({prob_pct}) is primarily driven by {', '.join(majors)}."
+        )
+        concern = "Immediate Specialist Cardiology Evaluation Recommended"
+        followup = "Schedule 12-lead ECG, Troponin / Cardiac Biomarker panel, lipid management, and urgent Cardiology appointment."
     elif prob >= 0.25:
-        assessment = f"Patient presents Moderate estimated probability ({prob_pct}) of 10-year Coronary Heart Disease events based on clinical telemetry."
+        assessment = (
+            f"The patient presents a Moderate estimated 10-year CHD risk ({prob_pct}), with risk driven by {', '.join(majors)} "
+            f"while mitigated by {', '.join(protects[:3])}."
+        )
         concern = "Moderate Clinical Concern — Risk Factor Optimization Required"
         followup = "Implement strict Blood Pressure control, statin therapy consideration, and routine follow-up in 30 days."
     else:
-        assessment = f"Patient demonstrates a Low to Very Low estimated probability ({prob_pct}) of 10-year Coronary Heart Disease."
-        concern = "Low Clinical Concern — Routine Health Maintenance"
-        followup = "Continue lifestyle health maintenance, low-sodium nutrition, and routine annual health screening."
+        assessment = (
+            f"The patient presents a Low estimated 10-year CHD risk ({prob_pct}), with risk driven by {', '.join(majors)} "
+            f"and mitigated by {', '.join(protects[:4])}."
+        )
+        concern = "Low Clinical Concern — Primary Prevention Focus"
+        followup = "Maintain regular primary care follow-up, dietary lifestyle modifications, and annual lipid monitoring."
 
     return StructuredInterpretation(
         overall_assessment=assessment,
-        major_risk_factors=majors,
-        protective_factors=protects,
+        major_risk_factors=[m.title() for m in majors],
+        protective_factors=[p.title() for p in protects],
         clinical_concern_level=concern,
         suggested_follow_up=followup
     )
