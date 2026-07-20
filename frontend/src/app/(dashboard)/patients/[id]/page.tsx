@@ -81,7 +81,8 @@ export default function PatientDetailsHub() {
   const handleDeletePatient = async () => {
     setSubmittingAction(true);
     try {
-      await api.delete(`/api/v1/patients/${patientId}`);
+      const targetId = patient?.patient_id || patientId;
+      await api.delete(`/api/v1/patients/${targetId}`);
       toast("Patient record successfully removed from the registry.", "success", "Patient Deleted");
       router.push("/patients");
     } catch (err: any) {
@@ -530,8 +531,8 @@ export default function PatientDetailsHub() {
                   </button>
                 )}
 
-                {/* Delete Patient: Doctor Only */}
-                {user.role.toLowerCase() === "doctor" && (
+                {/* Delete Patient: Doctor & Admin */}
+                {["doctor", "admin"].includes(user.role.toLowerCase()) && (
                   <button
                     onClick={() => setShowDeleteConfirm(true)}
                     className="w-full text-left p-3 rounded-xl border border-rose-200/60 bg-rose-600/5 hover:bg-rose-600/10 hover:border-rose-400 hover:scale-[1.02] active:scale-[0.99] transition-all duration-300 flex items-start gap-3 group cursor-pointer"
@@ -1070,7 +1071,7 @@ export default function PatientDetailsHub() {
                   placeholder="Type DELETE to confirm"
                   className="w-full border border-slate-200 rounded-xl p-2.5 bg-slate-50 text-slate-800 font-extrabold focus:outline-none focus:ring-1 focus:ring-rose-500 uppercase tracking-widest text-center"
                   value={deleteConfirmationText}
-                  onChange={(e) => setDeleteConfirmationText(e.target.value)}
+                  onChange={(e) => setDeleteConfirmationText(e.target.value.toUpperCase())}
                 />
               </div>
 
@@ -1088,7 +1089,7 @@ export default function PatientDetailsHub() {
                 <GlassButton
                   type="button"
                   variant="danger"
-                  disabled={deleteConfirmationText !== "DELETE" || submittingAction}
+                  disabled={deleteConfirmationText.trim().toUpperCase() !== "DELETE" || submittingAction}
                   onClick={handleDeletePatient}
                 >
                   {submittingAction ? "Deleting..." : "Permanently Delete Patient"}

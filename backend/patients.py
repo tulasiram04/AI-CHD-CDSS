@@ -513,10 +513,10 @@ def delete_patient(
     db: Session = Depends(get_db)
 ):
     """Soft-deletes a patient record and their active admissions. Restricted to doctors."""
-    if current_user.role.lower() != "doctor":
+    if current_user.role.lower() not in ["doctor", "admin"]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied: Only doctors can delete patient records."
+            detail="Access denied: Only doctors and administrators can delete patient records."
         )
         
     patient = db.query(Patient).filter(Patient.id == patient_id, Patient.is_deleted == False).first()

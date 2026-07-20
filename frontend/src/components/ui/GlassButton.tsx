@@ -48,6 +48,8 @@ default:
   };
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (props.disabled) return;
+
     if (buttonRef.current) {
       const button = buttonRef.current;
       const rect = button.getBoundingClientRect();
@@ -73,11 +75,11 @@ default:
   return (
     <motion.button
       ref={buttonRef}
-      whileHover={{ y: -1, scale: 1.01 }}
-      whileTap={{ scale: 0.99 }}
+      whileHover={props.disabled ? undefined : { y: -1, scale: 1.01 }}
+      whileTap={props.disabled ? undefined : { scale: 0.99 }}
       transition={{ type: "spring", stiffness: 400, damping: 15 }}
       onClick={handleClick}
-      className={`ripple-effect cursor-pointer inline-flex items-center justify-center gap-2 transition-all duration-200 outline-none select-none ${getVariantStyles()} ${getSizeStyles()} ${className}`}
+      className={`ripple-effect cursor-pointer inline-flex items-center justify-center gap-2 transition-all duration-200 outline-none select-none disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:pointer-events-none ${getVariantStyles()} ${getSizeStyles()} ${className}`}
       {...props}
     >
       {children}
