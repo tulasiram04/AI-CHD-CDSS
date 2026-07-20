@@ -68,9 +68,10 @@ def seed_database():
                 db.commit()
                 db.refresh(user)
             else:
-                user.password_hash = pwd_hash
-                user.is_active = True
-                db.commit()
+                # User already exists; preserve their updated password_hash!
+                if not user.is_active:
+                    user.is_active = True
+                    db.commit()
             seeded_users[role_name] = user
             
             # Seed doctor profile if role is doctor
