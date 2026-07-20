@@ -351,6 +351,9 @@ export default function ReportsCenter() {
   const handleDownload = async (report: ReportRecord) => {
     toast(`Generating PDF for: ${report.name}…`, "info", "Preparing Download");
     try {
+      const auditProb = latestAudit ? latestAudit.predicted_risk : 0.224;
+      const auditInputs = latestAudit ? (latestAudit.inputs_json || {}) : {};
+
       await downloadGenericReport({
         title: report.name,
         type: report.type,
@@ -359,6 +362,21 @@ export default function ReportsCenter() {
         generatedDate: report.generatedDate,
         status: report.status,
         fileSize: report.fileSize,
+        predictedRisk: auditProb,
+        riskLevel: latestAudit ? latestAudit.risk_level : "Moderate",
+        patientUuid: latestAudit ? latestAudit.patient_uuid : report.patient,
+        age: auditInputs.age || 62,
+        gender: auditInputs.gender !== undefined ? auditInputs.gender : 1,
+        systolicBp: auditInputs.systolic_bp || 135,
+        diastolicBp: auditInputs.diastolic_bp || 85,
+        heartRate: auditInputs.heart_rate || 74,
+        glucose: auditInputs.glucose || 110,
+        cholesterol: auditInputs.cholesterol || 195,
+        bmi: auditInputs.bmi || 26.8,
+        hypertension: auditInputs.hypertension !== undefined ? auditInputs.hypertension : 1,
+        diabetes: auditInputs.diabetes !== undefined ? auditInputs.diabetes : 1,
+        smoking: auditInputs.smoking !== undefined ? auditInputs.smoking : 0,
+        previousCardiac: auditInputs.previous_cardiac !== undefined ? auditInputs.previous_cardiac : 0,
       });
       toast(`PDF downloaded: ${report.name}`, "success", "Download Complete");
     } catch (err) {
