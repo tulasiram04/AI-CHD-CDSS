@@ -21,8 +21,7 @@ from backend.profile import router as profile_router
 
 # Setup API logging
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 )
 logger = logging.getLogger("FastAPIApplication")
 
@@ -31,7 +30,7 @@ app = FastAPI(
     description="FastAPI REST Backend for Coronary Heart Disease Clinical Decision Support System",
     version="1.0.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
 )
 
 # CORS configuration
@@ -43,14 +42,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Global Exception Handler
 @app.exception_handler(Exception)
 def global_exception_handler(request: Request, exc: Exception):
     logger.error(f"Unhandled system error occurred: {exc}", exc_info=True)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"detail": "A critical system error occurred. Please contact the administrator."}
+        content={
+            "detail": "A critical system error occurred. Please contact the administrator."
+        },
     )
+
 
 # Routers registration
 app.include_router(auth_router)
@@ -62,6 +65,7 @@ app.include_router(notification_router)
 app.include_router(reports_router)
 app.include_router(profile_router)
 
+
 # Health check endpoint
 @app.get("/health", tags=["System Checks"])
 def health_check():
@@ -70,8 +74,9 @@ def health_check():
         "status": "healthy",
         "project": settings.PROJECT_NAME,
         "environment": settings.ENV,
-        "debug_mode": settings.DEBUG
+        "debug_mode": settings.DEBUG,
     }
+
 
 if __name__ == "__main__":
     logger.info("Starting local Uvicorn development server...")

@@ -25,6 +25,7 @@ if config.config_file_name is not None:
 # Set target metadata from our models
 target_metadata = Base.metadata
 
+
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
@@ -59,7 +60,7 @@ def run_migrations_online() -> None:
     # Override URL with the one from our environment settings
     configuration = config.get_section(config.config_ini_section) or {}
     configuration["sqlalchemy.url"] = settings.DATABASE_URL
-    
+
     connectable = engine_from_config(
         configuration,
         prefix="sqlalchemy.",
@@ -67,9 +68,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

@@ -3,13 +3,17 @@ import uuid
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
 
+
 # Auth schemas
 class UserCreate(BaseModel):
     email: str
     password: str = Field(..., min_length=6)
-    role: str = Field(default="doctor", description="Role: admin, doctor, auditor, governance")
+    role: str = Field(
+        default="doctor", description="Role: admin, doctor, auditor, governance"
+    )
     full_name: Optional[str] = Field(None, description="Full display name")
     phone: Optional[str] = Field(None, description="Contact phone number")
+
 
 class UserResponse(BaseModel):
     id: uuid.UUID
@@ -21,23 +25,28 @@ class UserResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
 class LoginRequest(BaseModel):
     email: str
     password: str
+
 
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserResponse
 
+
 # --------------------------------------------------
 # Profile Schemas
 # --------------------------------------------------
+
 
 class ProfileCompletion(BaseModel):
     completed: int
     total: int
     percentage: int
+
 
 class NotificationPreferenceResponse(BaseModel):
     pref_prediction: bool = True
@@ -54,6 +63,7 @@ class NotificationPreferenceResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
 class NotificationPreferenceUpdate(BaseModel):
     pref_prediction: Optional[bool] = None
     pref_high_risk: Optional[bool] = None
@@ -66,6 +76,7 @@ class NotificationPreferenceUpdate(BaseModel):
     pref_sms: Optional[bool] = None
     browser_permission: Optional[str] = None
 
+
 class ActivityResponse(BaseModel):
     id: uuid.UUID
     activity_type: str
@@ -75,11 +86,13 @@ class ActivityResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
 class SecurityStatusResponse(BaseModel):
     last_login: Optional[datetime] = None
     last_password_changed_at: Optional[datetime] = None
     account_status: str
     total_activity_count: int
+
 
 class ProfileResponse(BaseModel):
     # User identity
@@ -114,8 +127,10 @@ class ProfileResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
 class ProfileUpdate(BaseModel):
     """Fields the doctor themselves can edit."""
+
     full_name: Optional[str] = Field(None, max_length=100)
     phone: Optional[str] = Field(None, max_length=30)
     experience: Optional[str] = Field(None, max_length=50)
@@ -124,23 +139,30 @@ class ProfileUpdate(BaseModel):
     office_extension: Optional[str] = Field(None, max_length=20)
     bio: Optional[str] = Field(None, max_length=500)
 
+
 class PasswordUpdateRequest(BaseModel):
     current_password: str
     new_password: str = Field(..., min_length=8)
     confirm_password: str
 
+
 class PhotoUploadResponse(BaseModel):
     photo_url: str
     message: str
+
 
 # Staff registration requests schemas
 class PendingRegistrationCreate(BaseModel):
     email: str
     password: str = Field(..., min_length=6)
-    role: str = Field(..., description="Nurse, Lab Tech, ECG Tech, Radiology Tech, Medical Researcher, Pharmacist, Physiotherapist, Dietitian")
+    role: str = Field(
+        ...,
+        description="Nurse, Lab Tech, ECG Tech, Radiology Tech, Medical Researcher, Pharmacist, Physiotherapist, Dietitian",
+    )
     license_number: str
     specialty: str
     department: str
+
 
 class PendingRegistrationResponse(BaseModel):
     id: uuid.UUID
@@ -156,20 +178,34 @@ class PendingRegistrationResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
 class PendingRequestAction(BaseModel):
     action: str = Field(..., description="approve, reject, request-info")
     notes: Optional[str] = None
+
 
 # Prediction schemas
 class PredictionRequest(BaseModel):
     age: float = Field(..., ge=18, le=120, description="Age in years (18-120)")
     gender: int = Field(..., ge=0, le=1, description="0: Female, 1: Male")
-    bmi: Optional[float] = Field(None, ge=10, le=70, description="Body Mass Index (10-70)")
-    systolic_bp: Optional[float] = Field(None, ge=60, le=260, description="Systolic BP (60-260 mmHg)")
-    diastolic_bp: Optional[float] = Field(None, ge=30, le=180, description="Diastolic BP (30-180 mmHg)")
-    glucose: Optional[float] = Field(None, ge=20, le=800, description="Glucose (20-800 mg/dL)")
-    heart_rate: Optional[float] = Field(None, ge=25, le=220, description="Heart rate (25-220 bpm)")
-    cholesterol: Optional[float] = Field(None, ge=50, le=800, description="Cholesterol (50-800 mg/dL)")
+    bmi: Optional[float] = Field(
+        None, ge=10, le=70, description="Body Mass Index (10-70)"
+    )
+    systolic_bp: Optional[float] = Field(
+        None, ge=60, le=260, description="Systolic BP (60-260 mmHg)"
+    )
+    diastolic_bp: Optional[float] = Field(
+        None, ge=30, le=180, description="Diastolic BP (30-180 mmHg)"
+    )
+    glucose: Optional[float] = Field(
+        None, ge=20, le=800, description="Glucose (20-800 mg/dL)"
+    )
+    heart_rate: Optional[float] = Field(
+        None, ge=25, le=220, description="Heart rate (25-220 bpm)"
+    )
+    cholesterol: Optional[float] = Field(
+        None, ge=50, le=800, description="Cholesterol (50-800 mg/dL)"
+    )
     admission_frequency: int = Field(default=1, ge=0)
     medication_count: int = Field(default=0, ge=0)
     hypertension: int = Field(default=0, ge=0, le=1)
@@ -181,10 +217,12 @@ class PredictionRequest(BaseModel):
     ace_arb_history: int = Field(default=0, ge=0, le=1)
     aspirin_history: int = Field(default=0, ge=0, le=1)
 
+
 class RecommendationItem(BaseModel):
     category: str
     recommendation_text: str
     clinical_justification: Optional[str] = None
+
 
 class TopContributorItem(BaseModel):
     feature: str
@@ -195,11 +233,13 @@ class TopContributorItem(BaseModel):
     detail: Optional[str] = None
     value: float
 
+
 class NormalRangeItem(BaseModel):
     parameter: str
     actual_value: str
     normal_range: str
     status: str
+
 
 class StructuredInterpretation(BaseModel):
     overall_assessment: str
@@ -208,11 +248,13 @@ class StructuredInterpretation(BaseModel):
     clinical_concern_level: str
     suggested_follow_up: str
 
+
 class PredictionTrendInfo(BaseModel):
     previous_risk: Optional[float] = None
     current_risk: float
     difference: Optional[float] = None
     trend: str  # "Improving", "Stable", "Worsening", or "Baseline Evaluation"
+
 
 class PatientSummaryInfo(BaseModel):
     age: float
@@ -225,6 +267,7 @@ class PatientSummaryInfo(BaseModel):
     risk_factors: List[str]
     medications: List[str]
 
+
 class ModelMetadataDetails(BaseModel):
     model_name: str
     algorithm: str
@@ -236,6 +279,7 @@ class ModelMetadataDetails(BaseModel):
     cross_validation_score: float
     prediction_id: str
     prediction_timestamp: str
+
 
 class PredictionResponse(BaseModel):
     prediction_uuid: str
@@ -258,6 +302,7 @@ class PredictionResponse(BaseModel):
     model_details: ModelMetadataDetails
     execution_latency_ms: float
 
+
 # Governance schemas
 class ModelArtifactResponse(BaseModel):
     id: uuid.UUID
@@ -274,8 +319,10 @@ class ModelArtifactResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
 class ModelApprovalRequest(BaseModel):
     comment: Optional[str] = None
+
 
 class ModelApprovalResponse(BaseModel):
     id: uuid.UUID
@@ -288,6 +335,7 @@ class ModelApprovalResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
 
 # Auditing schemas
 class PredictionAuditResponse(BaseModel):
@@ -303,6 +351,7 @@ class PredictionAuditResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
 
 class InferenceLogResponse(BaseModel):
     id: uuid.UUID
@@ -339,9 +388,11 @@ class PatientCreate(BaseModel):
     smoking: int = Field(default=0, ge=0, le=1)
     previous_cardiac: int = Field(default=0, ge=0, le=1)
 
+
 class PatientUpdate(BaseModel):
     age: Optional[int] = Field(None, ge=0, le=120)
     gender: Optional[int] = Field(None, ge=0, le=1)
+
 
 class VitalsUpdate(BaseModel):
     systolic_bp: Optional[float] = Field(None, ge=50, le=250)
@@ -349,11 +400,13 @@ class VitalsUpdate(BaseModel):
     heart_rate: Optional[float] = Field(None, ge=30, le=220)
     bmi: Optional[float] = Field(None, ge=10, le=80)
 
+
 class LabUpload(BaseModel):
     lab_name: str
     result_value: float
     unit: str
     comments: Optional[str] = None
+
 
 class EcgUpload(BaseModel):
     heart_rate: float
@@ -361,6 +414,7 @@ class EcgUpload(BaseModel):
     qrs_duration_ms: Optional[float] = None
     qt_interval_ms: Optional[float] = None
     interpretation: str
+
 
 class RadiologyUpload(BaseModel):
     modality: str
@@ -371,13 +425,27 @@ class RadiologyUpload(BaseModel):
 
 # Report schemas
 class ReportCreate(BaseModel):
-    name: str = Field(..., min_length=1, max_length=255, description="Human-readable report name")
-    report_type: str = Field(..., description="e.g. Clinical Chart, Prediction Report, Audit & Governance, Cohort Analysis")
+    name: str = Field(
+        ..., min_length=1, max_length=255, description="Human-readable report name"
+    )
+    report_type: str = Field(
+        ...,
+        description="e.g. Clinical Chart, Prediction Report, Audit & Governance, Cohort Analysis",
+    )
     category: str = Field(..., description="patient | prediction | clinical | audit")
-    patient_id: Optional[uuid.UUID] = Field(None, description="Optional: linked patient")
-    admission_id: Optional[uuid.UUID] = Field(None, description="Optional: linked admission")
-    prediction_id: Optional[uuid.UUID] = Field(None, description="Optional: linked prediction")
-    report_data: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Arbitrary report payload JSON")
+    patient_id: Optional[uuid.UUID] = Field(
+        None, description="Optional: linked patient"
+    )
+    admission_id: Optional[uuid.UUID] = Field(
+        None, description="Optional: linked admission"
+    )
+    prediction_id: Optional[uuid.UUID] = Field(
+        None, description="Optional: linked prediction"
+    )
+    report_data: Optional[Dict[str, Any]] = Field(
+        default_factory=dict, description="Arbitrary report payload JSON"
+    )
+
 
 class ReportResponse(BaseModel):
     id: uuid.UUID

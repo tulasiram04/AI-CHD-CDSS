@@ -16,14 +16,25 @@ from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from backend.database.session import get_db
-from backend.database.models import User, DoctorProfile, ActivityLog, AuditLog, NotificationPreference
+from backend.database.models import (
+    User,
+    DoctorProfile,
+    ActivityLog,
+    AuditLog,
+    NotificationPreference,
+)
 from backend.auth import get_current_user
 from backend.security import verify_password, get_password_hash
 from backend.schemas import (
-    ProfileResponse, ProfileUpdate, ProfileCompletion,
+    ProfileResponse,
+    ProfileUpdate,
+    ProfileCompletion,
     PasswordUpdateRequest,
-    NotificationPreferenceResponse, NotificationPreferenceUpdate,
-    ActivityResponse, SecurityStatusResponse, PhotoUploadResponse
+    NotificationPreferenceResponse,
+    NotificationPreferenceUpdate,
+    ActivityResponse,
+    SecurityStatusResponse,
+    PhotoUploadResponse,
 )
 
 logger = logging.getLogger(__name__)
@@ -43,9 +54,14 @@ ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png"}
 MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024  # 5 MB
 
 COMPLETION_FIELDS = [
-    "photo_url", "full_name", "phone",
-    "qualification", "experience",
-    "emergency_contact", "office_extension", "bio"
+    "photo_url",
+    "full_name",
+    "phone",
+    "qualification",
+    "experience",
+    "emergency_contact",
+    "office_extension",
+    "bio",
 ]
 
 
@@ -56,6 +72,7 @@ class StorageService:
     To swap to S3/Cloudinary: implement save() and delete() using the new provider
     and update the `storage` module-level instance below.
     """
+
     def save(self, file: UploadFile, filename: str) -> str:
         path = os.path.join(UPLOAD_DIR, filename)
         with open(path, "wb") as buffer:
@@ -77,20 +94,20 @@ storage = StorageService()
 # Helper utilities
 # ---------------------------------------------------------------------------
 
+
 def _compute_completion(profile: DoctorProfile) -> ProfileCompletion:
-    completed = sum(
-        1 for field in COMPLETION_FIELDS
-        if getattr(profile, field, None)
-    )
+    completed = sum(1 for field in COMPLETION_FIELDS if getattr(profile, field, None))
     total = len(COMPLETION_FIELDS)
     pct = round(completed / total * 100)
     return ProfileCompletion(completed=completed, total=total, percentage=pct)
 
 
 def _get_or_create_notifications(user: User, db: Session) -> NotificationPreference:
-    prefs = db.query(NotificationPreference).filter(
-        NotificationPreference.user_id == user.id
-    ).first()
+    prefs = (
+        db.query(NotificationPreference)
+        .filter(NotificationPreference.user_id == user.id)
+        .first()
+    )
     if not prefs:
         prefs = NotificationPreference(user_id=user.id)
         db.add(prefs)
@@ -99,7 +116,9 @@ def _get_or_create_notifications(user: User, db: Session) -> NotificationPrefere
     return prefs
 
 
-def _get_security_status(user: User, profile: Optional[DoctorProfile], db: Session) -> SecurityStatusResponse:
+def _get_security_status(
+    user: User, profile: Optional[DoctorProfile], db: Session
+) -> SecurityStatusResponse:
     last_login_log = (
         db.query(AuditLog)
         .filter(AuditLog.user_id == user.id, AuditLog.action == "login")
@@ -107,9 +126,7 @@ def _get_security_status(user: User, profile: Optional[DoctorProfile], db: Sessi
         .first()
     )
     total_activity = (
-        db.query(ActivityLog)
-        .filter(ActivityLog.user_id == user.id)
-        .count()
+        db.query(ActivityLog).filter(ActivityLog.user_id == user.id).count()
     )
     return SecurityStatusResponse(
         last_login=last_login_log.created_at if last_login_log else None,
@@ -123,7 +140,11 @@ def _build_profile_response(user: User, db: Session) -> ProfileResponse:
     profile = user.doctor_profile
     prefs = _get_or_create_notifications(user, db)
     security = _get_security_status(user, profile, db)
-    completion = _compute_completion(profile) if profile else ProfileCompletion(completed=0, total=8, percentage=0)
+    completion = (
+        _compute_completion(profile)
+        if profile
+        else ProfileCompletion(completed=0, total=8, percentage=0)
+    )
     notif_resp = NotificationPreferenceResponse.model_validate(prefs)
 
     return ProfileResponse(
@@ -153,7 +174,9 @@ def _build_profile_response(user: User, db: Session) -> ProfileResponse:
     )
 
 
-def _log_activity(user_id: uuid.UUID, activity_type: str, details: Optional[str], db: Session) -> None:
+def _log_activity(
+    user_id: uuid.UUID, activity_type: str, details: Optional[str], db: Session
+) -> None:
     log = ActivityLog(user_id=user_id, activity_type=activity_type, details=details)
     db.add(log)
     db.commit()
@@ -166,8 +189,7 @@ def get_photo(filename: str):
     path = os.path.join(UPLOAD_DIR, safe_filename)
     if not os.path.exists(path):
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Profile photo not found."
+            status_code=status.HTTP_404_NOT_FOUND, detail="Profile photo not found."
         )
     return FileResponse(path)
 
@@ -175,6 +197,7 @@ def get_photo(filename: str):
 # ---------------------------------------------------------------------------
 # Endpoints
 # ---------------------------------------------------------------------------
+
 
 @router.get("/me", response_model=ProfileResponse)
 def get_profile_me(
@@ -203,7 +226,7 @@ def update_profile(
     if not profile:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Doctor profile not found. Contact administrator."
+            detail="Doctor profile not found. Contact administrator.",
         )
 
     changed_fields = []
@@ -216,7 +239,12 @@ def update_profile(
     db.refresh(profile)
 
     if changed_fields:
-        _log_activity(current_user.id, "Profile Updated", f"Fields updated: {', '.join(changed_fields)}", db)
+        _log_activity(
+            current_user.id,
+            "Profile Updated",
+            f"Fields updated: {', '.join(changed_fields)}",
+            db,
+        )
 
     logger.info(f"Profile updated for user {current_user.email}: {changed_fields}")
     return _build_profile_response(current_user, db)
@@ -237,15 +265,14 @@ async def upload_photo(
     if ext not in ALLOWED_EXTENSIONS:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid file type '{ext}'. Allowed: jpg, jpeg, png."
+            detail=f"Invalid file type '{ext}'. Allowed: jpg, jpeg, png.",
         )
 
     # Validate size
     content = await file.read()
     if len(content) > MAX_FILE_SIZE_BYTES:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="File exceeds 5MB limit."
+            status_code=status.HTTP_400_BAD_REQUEST, detail="File exceeds 5MB limit."
         )
     await file.seek(0)
 
@@ -266,7 +293,9 @@ async def upload_photo(
     db.commit()
 
     _log_activity(current_user.id, "Photo Uploaded", filename, db)
-    return PhotoUploadResponse(photo_url=url, message="Profile photo updated successfully.")
+    return PhotoUploadResponse(
+        photo_url=url, message="Profile photo updated successfully."
+    )
 
 
 @router.delete("/photo")
@@ -303,14 +332,14 @@ def update_password(
     if not verify_password(payload.current_password, current_user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Current password is incorrect."
+            detail="Current password is incorrect.",
         )
 
     # Validate new passwords match
     if payload.new_password != payload.confirm_password:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="New passwords do not match."
+            detail="New passwords do not match.",
         )
 
     # Hash and save new password
@@ -327,7 +356,7 @@ def update_password(
 
     return {
         "message": "Password updated successfully. Please log in again.",
-        "session_revoked": True
+        "session_revoked": True,
     }
 
 
@@ -386,6 +415,11 @@ def update_notifications(
     db.refresh(prefs)
 
     if changed:
-        _log_activity(current_user.id, "Notification Preferences Updated", f"Updated: {', '.join(changed)}", db)
+        _log_activity(
+            current_user.id,
+            "Notification Preferences Updated",
+            f"Updated: {', '.join(changed)}",
+            db,
+        )
 
     return prefs

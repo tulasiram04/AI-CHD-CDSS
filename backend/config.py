@@ -3,11 +3,10 @@ from typing import List
 from pydantic import AnyHttpUrl, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        extra="ignore"
+        env_file=".env", env_file_encoding="utf-8", extra="ignore"
     )
 
     ENV: str = "production"
@@ -22,7 +21,9 @@ class Settings(BaseSettings):
     POSTGRES_DB: str = "chd_cdss"
     POSTGRES_HOST: str = "localhost"
     POSTGRES_PORT: int = 5432
-    DATABASE_URL: str = "postgresql://postgres:postgres_chd_secure_pwd@localhost:5432/chd_cdss"
+    DATABASE_URL: str = (
+        "postgresql://postgres:postgres_chd_secure_pwd@localhost:5432/chd_cdss"
+    )
 
     # Redis Configuration (optional on free tier — Celery tasks will be skipped)
     REDIS_HOST: str = "localhost"
@@ -39,7 +40,9 @@ class Settings(BaseSettings):
 
     # MIMIC Dataset Paths
     MIMIC_DATA_PATH: str = "/app/data/mimic"
-    PROCESSED_DATA_PATH: str = "/app/etl/processed_chd_dataset/processed_20260714_v1.csv"
+    PROCESSED_DATA_PATH: str = (
+        "/app/etl/processed_chd_dataset/processed_20260714_v1.csv"
+    )
 
     # CORS Configuration — include Render URLs
     ALLOWED_ORIGINS: str = (
@@ -50,6 +53,11 @@ class Settings(BaseSettings):
 
     @property
     def cors_origins(self) -> List[str]:
-        return [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",") if origin.strip()]
+        return [
+            origin.strip()
+            for origin in self.ALLOWED_ORIGINS.split(",")
+            if origin.strip()
+        ]
+
 
 settings = Settings()
