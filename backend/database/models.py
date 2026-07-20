@@ -602,3 +602,39 @@ class NotificationPreference(Base):
     )
 
     user = relationship("User", back_populates="notification_preference")
+
+
+class Hospital(Base, AuditableMixin):
+    __tablename__ = "hospitals"
+    __table_args__ = {"extend_existing": True}
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    code: Mapped[str] = mapped_column(
+        String(50), unique=True, nullable=False, index=True
+    )
+    city: Mapped[str] = mapped_column(String(100), nullable=False)
+    state: Mapped[str] = mapped_column(String(100), nullable=False)
+    country: Mapped[str] = mapped_column(
+        String(100), default="United States", nullable=False
+    )
+    status: Mapped[str] = mapped_column(String(50), default="Active", nullable=False)
+    contact_email: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    contact_phone: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    total_beds: Mapped[int] = mapped_column(Integer, default=250, nullable=False)
+    icu_beds: Mapped[int] = mapped_column(Integer, default=35, nullable=False)
+
+
+class Department(Base, AuditableMixin):
+    __tablename__ = "departments"
+    __table_args__ = {"extend_existing": True}
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    hospital_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        Uuid, ForeignKey("hospitals.id"), nullable=True
+    )
+    name: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    code: Mapped[str] = mapped_column(String(50), nullable=False)
+    head_clinician: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    status: Mapped[str] = mapped_column(String(50), default="Active", nullable=False)
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
