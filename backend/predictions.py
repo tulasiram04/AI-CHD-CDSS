@@ -912,9 +912,10 @@ def execute_clinical_inference(raw_data: dict) -> tuple:
         bp_factor + chol_factor + gluc_factor + adm_factor + med_factor - 1.50
     )
     
-    calibrated_prob = 1.0 / (1.0 + np.exp(-total_logit))
+    calibrated_prob = float(1.0 / (1.0 + np.exp(-total_logit)))
     # Guarantee probability floor & ceiling (never clip to 0 unless true 0)
-    calibrated_prob = max(0.012, min(0.988, calibrated_prob))
+    calibrated_prob = float(max(0.012, min(0.988, calibrated_prob)))
+    raw_prob = float(raw_prob)
     
     logger.info(f"Model Class 1 Raw Prob: {raw_prob:.4f}")
     logger.info(f"Calibrated Risk Probability: {calibrated_prob:.4f} ({calibrated_prob * 100:.1f}%)")
@@ -968,9 +969,9 @@ def predict_direct(
             patient_uuid="DIRECT_INPUT_PHASE_3",
             model_version=_model_version,
             inputs_json=raw_inputs,
-            predicted_risk=calibrated_prob,
-            confidence_interval_low=max(0.0, calibrated_prob - 0.05),
-            confidence_interval_high=min(1.0, calibrated_prob + 0.05),
+            predicted_risk=float(calibrated_prob),
+            confidence_interval_low=float(max(0.0, calibrated_prob - 0.05)),
+            confidence_interval_high=float(min(1.0, calibrated_prob + 0.05)),
             risk_level=risk_lvl,
             request_ip=request.client.host if request.client else "127.0.0.1",
             request_user_agent=request.headers.get("user-agent", "unknown")
@@ -1153,9 +1154,9 @@ def predict_admission(
             patient_uuid=str(patient.patient_uuid),
             model_version=_model_version,
             inputs_json=raw_inputs,
-            predicted_risk=calibrated_prob,
-            confidence_interval_low=max(0.0, calibrated_prob - 0.05),
-            confidence_interval_high=min(1.0, calibrated_prob + 0.05),
+            predicted_risk=float(calibrated_prob),
+            confidence_interval_low=float(max(0.0, calibrated_prob - 0.05)),
+            confidence_interval_high=float(min(1.0, calibrated_prob + 0.05)),
             risk_level=risk_lvl,
             request_ip=request.client.host if request.client else "127.0.0.1",
             request_user_agent=request.headers.get("user-agent", "unknown")
