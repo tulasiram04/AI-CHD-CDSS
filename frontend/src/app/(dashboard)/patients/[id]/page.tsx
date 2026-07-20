@@ -373,6 +373,7 @@ export default function PatientDetailsHub() {
       <div className="space-y-6">
         {/* Overview Tab */}
         {activeTab === "overview" && (
+          <>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <GlassCard className="md:col-span-2 space-y-4">
               <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
@@ -440,119 +441,121 @@ export default function PatientDetailsHub() {
               </div>
             </GlassCard>
 
-            {user && (
-              <GlassCard className="space-y-4">
-                <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-                  <Settings className="h-4.5 w-4.5 text-slate-600" />
-                  <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Clinical Actions Hub</h4>
-                </div>
-                <div className="space-y-2.5">
-                  {/* Demographics update: Admin, Doctor, Nurse */}
-                  {["admin", "doctor", "nurse"].includes(user.role.toLowerCase()) && (
-                    <button
-                      onClick={openDemographics}
-                      className="w-full text-left p-3 rounded-xl border border-indigo-100/50 bg-indigo-500/5 hover:bg-indigo-500/10 hover:border-indigo-300 hover:scale-[1.02] active:scale-[0.99] transition-all duration-300 flex items-start gap-3 group cursor-pointer"
-                    >
-                      <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-600 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300">
-                        <Settings className="h-4 w-4" />
-                      </div>
-                      <div className="space-y-0.5">
-                        <h5 className="text-xs font-extrabold text-slate-800">Edit Demographics</h5>
-                        <p className="text-[10px] text-slate-500 font-medium">Update patient age and biological gender records.</p>
-                      </div>
-                    </button>
-                  )}
-
-                  {/* Vitals update: Admin, Doctor, Nurse */}
-                  {["admin", "doctor", "nurse"].includes(user.role.toLowerCase()) && (
-                    <button
-                      onClick={openVitals}
-                      className="w-full text-left p-3 rounded-xl border border-rose-100/50 bg-rose-500/5 hover:bg-rose-500/10 hover:border-rose-300 hover:scale-[1.02] active:scale-[0.99] transition-all duration-300 flex items-start gap-3 group cursor-pointer"
-                    >
-                      <div className="p-2 rounded-lg bg-rose-500/10 text-rose-600 group-hover:bg-rose-500 group-hover:text-white transition-all duration-300">
-                        <HeartPulse className="h-4 w-4" />
-                      </div>
-                      <div className="space-y-0.5">
-                        <h5 className="text-xs font-extrabold text-slate-800">Update Vitals</h5>
-                        <p className="text-[10px] text-slate-500 font-medium">Log blood pressure, heart rate, and BMI values.</p>
-                      </div>
-                    </button>
-                  )}
-
-                  {/* Upload Labs: Admin, Doctor, Lab Tech */}
-                  {["admin", "doctor", "lab tech"].includes(user.role.toLowerCase()) && (
-                    <button
-                      onClick={() => setActiveActionModal("labs")}
-                      className="w-full text-left p-3 rounded-xl border border-emerald-100/50 bg-emerald-500/5 hover:bg-emerald-500/10 hover:border-emerald-300 hover:scale-[1.02] active:scale-[0.99] transition-all duration-300 flex items-start gap-3 group cursor-pointer"
-                    >
-                      <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
-                        <FileSpreadsheet className="h-4 w-4" />
-                      </div>
-                      <div className="space-y-0.5">
-                        <h5 className="text-xs font-extrabold text-slate-800">Upload Lab Results</h5>
-                        <p className="text-[10px] text-slate-500 font-medium">Add metabolic panel, glucose, or cardiac biomarker data.</p>
-                      </div>
-                    </button>
-                  )}
-
-                  {/* Upload ECG: Admin, Doctor, ECG Tech */}
-                  {["admin", "doctor", "ecg tech"].includes(user.role.toLowerCase()) && (
-                    <button
-                      onClick={() => setActiveActionModal("ecg")}
-                      className="w-full text-left p-3 rounded-xl border border-sky-100/50 bg-sky-500/5 hover:bg-sky-500/10 hover:border-sky-300 hover:scale-[1.02] active:scale-[0.99] transition-all duration-300 flex items-start gap-3 group cursor-pointer"
-                    >
-                      <div className="p-2 rounded-lg bg-sky-500/10 text-sky-600 group-hover:bg-sky-500 group-hover:text-white transition-all duration-300">
-                        <Activity className="h-4 w-4" />
-                      </div>
-                      <div className="space-y-0.5">
-                        <h5 className="text-xs font-extrabold text-slate-800">Upload ECG Trace</h5>
-                        <p className="text-[10px] text-slate-500 font-medium">Record wave intervals and clinical telemetry interpretations.</p>
-                      </div>
-                    </button>
-                  )}
-
-                  {/* Upload Radiology: Admin, Doctor, Radiology Tech */}
-                  {["admin", "doctor", "radiology tech"].includes(user.role.toLowerCase()) && (
-                    <button
-                      onClick={() => setActiveActionModal("radiology")}
-                      className="w-full text-left p-3 rounded-xl border border-amber-100/50 bg-amber-500/5 hover:bg-amber-500/10 hover:border-amber-300 hover:scale-[1.02] active:scale-[0.99] transition-all duration-300 flex items-start gap-3 group cursor-pointer"
-                    >
-                      <div className="p-2 rounded-lg bg-amber-500/10 text-amber-600 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300">
-                        <UploadCloud className="h-4 w-4" />
-                      </div>
-                      <div className="space-y-0.5">
-                        <h5 className="text-xs font-extrabold text-slate-800">Upload Radiology Report</h5>
-                        <p className="text-[10px] text-slate-500 font-medium">Submit findings and impressions for CT, MRI or X-Ray scans.</p>
-                      </div>
-                    </button>
-                  )}
-
-                  {/* Delete Patient: Doctor Only */}
-                  {user.role.toLowerCase() === "doctor" && (
-                    <button
-                      onClick={() => setShowDeleteConfirm(true)}
-                      className="w-full text-left p-3 rounded-xl border border-rose-200/60 bg-rose-600/5 hover:bg-rose-600/10 hover:border-rose-400 hover:scale-[1.02] active:scale-[0.99] transition-all duration-300 flex items-start gap-3 group cursor-pointer mt-4"
-                    >
-                      <div className="p-2 rounded-lg bg-rose-600/10 text-rose-700 group-hover:bg-rose-600 group-hover:text-white transition-all duration-300">
-                        <Trash2 className="h-4 w-4" />
-                      </div>
-                      <div className="space-y-0.5">
-                        <h5 className="text-xs font-extrabold text-rose-700">Delete Patient Record</h5>
-                        <p className="text-[10px] text-rose-500 font-medium">Soft-delete this patient case file from the active registry.</p>
-                      </div>
-                    </button>
-                  )}
-                  
-                  {/* Informational banner if no actions are available */}
-                  {!["admin", "doctor", "nurse", "lab tech", "ecg tech", "radiology tech"].includes(user.role.toLowerCase()) && (
-                    <div className="text-[10px] text-slate-400 font-semibold text-center py-2 bg-slate-50 border border-slate-100 rounded-xl">
-                      No document upload or edit privileges for role: {user.role}
-                    </div>
-                  )}
-                </div>
-              </GlassCard>
-            )}
           </div>
+
+          {user && (
+            <GlassCard className="space-y-4 mt-6">
+              <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+                <Settings className="h-4.5 w-4.5 text-slate-600" />
+                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Clinical Actions Hub</h4>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {/* Demographics update: Admin, Doctor, Nurse */}
+                {["admin", "doctor", "nurse"].includes(user.role.toLowerCase()) && (
+                  <button
+                    onClick={openDemographics}
+                    className="w-full text-left p-3 rounded-xl border border-indigo-100/50 bg-indigo-500/5 hover:bg-indigo-500/10 hover:border-indigo-300 hover:scale-[1.02] active:scale-[0.99] transition-all duration-300 flex items-start gap-3 group cursor-pointer"
+                  >
+                    <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-600 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300">
+                      <Settings className="h-4 w-4" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <h5 className="text-xs font-extrabold text-slate-800">Edit Demographics</h5>
+                      <p className="text-[10px] text-slate-500 font-medium">Update patient age and biological gender records.</p>
+                    </div>
+                  </button>
+                )}
+
+                {/* Vitals update: Admin, Doctor, Nurse */}
+                {["admin", "doctor", "nurse"].includes(user.role.toLowerCase()) && (
+                  <button
+                    onClick={openVitals}
+                    className="w-full text-left p-3 rounded-xl border border-rose-100/50 bg-rose-500/5 hover:bg-rose-500/10 hover:border-rose-300 hover:scale-[1.02] active:scale-[0.99] transition-all duration-300 flex items-start gap-3 group cursor-pointer"
+                  >
+                    <div className="p-2 rounded-lg bg-rose-500/10 text-rose-600 group-hover:bg-rose-500 group-hover:text-white transition-all duration-300">
+                      <HeartPulse className="h-4 w-4" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <h5 className="text-xs font-extrabold text-slate-800">Update Vitals</h5>
+                      <p className="text-[10px] text-slate-500 font-medium">Log blood pressure, heart rate, and BMI values.</p>
+                    </div>
+                  </button>
+                )}
+
+                {/* Upload Labs: Admin, Doctor, Lab Tech */}
+                {["admin", "doctor", "lab tech"].includes(user.role.toLowerCase()) && (
+                  <button
+                    onClick={() => setActiveActionModal("labs")}
+                    className="w-full text-left p-3 rounded-xl border border-emerald-100/50 bg-emerald-500/5 hover:bg-emerald-500/10 hover:border-emerald-300 hover:scale-[1.02] active:scale-[0.99] transition-all duration-300 flex items-start gap-3 group cursor-pointer"
+                  >
+                    <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
+                      <FileSpreadsheet className="h-4 w-4" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <h5 className="text-xs font-extrabold text-slate-800">Upload Lab Results</h5>
+                      <p className="text-[10px] text-slate-500 font-medium">Add metabolic panel, glucose, or cardiac biomarker data.</p>
+                    </div>
+                  </button>
+                )}
+
+                {/* Upload ECG: Admin, Doctor, ECG Tech */}
+                {["admin", "doctor", "ecg tech"].includes(user.role.toLowerCase()) && (
+                  <button
+                    onClick={() => setActiveActionModal("ecg")}
+                    className="w-full text-left p-3 rounded-xl border border-sky-100/50 bg-sky-500/5 hover:bg-sky-500/10 hover:border-sky-300 hover:scale-[1.02] active:scale-[0.99] transition-all duration-300 flex items-start gap-3 group cursor-pointer"
+                  >
+                    <div className="p-2 rounded-lg bg-sky-500/10 text-sky-600 group-hover:bg-sky-500 group-hover:text-white transition-all duration-300">
+                      <Activity className="h-4 w-4" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <h5 className="text-xs font-extrabold text-slate-800">Upload ECG Trace</h5>
+                      <p className="text-[10px] text-slate-500 font-medium">Record wave intervals and clinical telemetry interpretations.</p>
+                    </div>
+                  </button>
+                )}
+
+                {/* Upload Radiology: Admin, Doctor, Radiology Tech */}
+                {["admin", "doctor", "radiology tech"].includes(user.role.toLowerCase()) && (
+                  <button
+                    onClick={() => setActiveActionModal("radiology")}
+                    className="w-full text-left p-3 rounded-xl border border-amber-100/50 bg-amber-500/5 hover:bg-amber-500/10 hover:border-amber-300 hover:scale-[1.02] active:scale-[0.99] transition-all duration-300 flex items-start gap-3 group cursor-pointer"
+                  >
+                    <div className="p-2 rounded-lg bg-amber-500/10 text-amber-600 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300">
+                      <UploadCloud className="h-4 w-4" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <h5 className="text-xs font-extrabold text-slate-800">Upload Radiology Report</h5>
+                      <p className="text-[10px] text-slate-500 font-medium">Submit findings and impressions for CT, MRI or X-Ray scans.</p>
+                    </div>
+                  </button>
+                )}
+
+                {/* Delete Patient: Doctor Only */}
+                {user.role.toLowerCase() === "doctor" && (
+                  <button
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="w-full text-left p-3 rounded-xl border border-rose-200/60 bg-rose-600/5 hover:bg-rose-600/10 hover:border-rose-400 hover:scale-[1.02] active:scale-[0.99] transition-all duration-300 flex items-start gap-3 group cursor-pointer"
+                  >
+                    <div className="p-2 rounded-lg bg-rose-600/10 text-rose-700 group-hover:bg-rose-600 group-hover:text-white transition-all duration-300">
+                      <Trash2 className="h-4 w-4" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <h5 className="text-xs font-extrabold text-rose-700">Delete Patient Record</h5>
+                      <p className="text-[10px] text-rose-500 font-medium">Soft-delete this patient case file from the active registry.</p>
+                    </div>
+                  </button>
+                )}
+                
+                {/* Informational banner if no actions are available */}
+                {!["admin", "doctor", "nurse", "lab tech", "ecg tech", "radiology tech"].includes(user.role.toLowerCase()) && (
+                  <div className="text-[10px] text-slate-400 font-semibold text-center py-2 bg-slate-50 border border-slate-100 rounded-xl sm:col-span-2 lg:col-span-3">
+                    No document upload or edit privileges for role: {user.role}
+                  </div>
+                )}
+              </div>
+            </GlassCard>
+          )}
+          </>
         )}
 
         {/* Vitals Tab */}
