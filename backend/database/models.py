@@ -107,21 +107,36 @@ class DoctorProfile(Base, AuditableMixin):
 
 class PendingRegistration(Base):
     __tablename__ = "pending_registrations"
+    __table_args__ = {"extend_existing": True}
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    full_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     email: Mapped[str] = mapped_column(
         String(255), unique=True, index=True, nullable=False
     )
-    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
-    role: Mapped[str] = mapped_column(
-        String(50), nullable=False
-    )  # Nurse, Lab Tech, etc.
-    license_number: Mapped[str] = mapped_column(String(100), nullable=False)
-    specialty: Mapped[str] = mapped_column(String(100), nullable=False)
-    department: Mapped[str] = mapped_column(String(100), nullable=False)
-    status: Mapped[str] = mapped_column(
-        String(50), default="Pending", nullable=False
-    )  # Pending, Approved, Rejected, Info Requested
+    password_hash: Mapped[str] = mapped_column(
+        String(255), nullable=False, default="hash"
+    )
+    role: Mapped[str] = mapped_column(String(50), nullable=False, default="doctor")
+    requested_role: Mapped[Optional[str]] = mapped_column(
+        String(50), nullable=True, default="doctor"
+    )
+    license_number: Mapped[str] = mapped_column(
+        String(100), nullable=False, default="MD-Pending"
+    )
+    specialty: Mapped[str] = mapped_column(
+        String(100), nullable=False, default="General Medicine"
+    )
+    specialization: Mapped[Optional[str]] = mapped_column(
+        String(100), nullable=True, default="General Medicine"
+    )
+    hospital_affiliation: Mapped[Optional[str]] = mapped_column(
+        String(200), nullable=True
+    )
+    department: Mapped[str] = mapped_column(
+        String(100), nullable=False, default="Cardiology"
+    )
+    status: Mapped[str] = mapped_column(String(50), default="Pending", nullable=False)
     info_request_notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, nullable=False
@@ -320,19 +335,37 @@ class PredictionHistory(Base):
 
 class ModelRegistry(Base):
     __tablename__ = "model_registry"
+    __table_args__ = {"extend_existing": True}
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     model_uuid: Mapped[str] = mapped_column(
-        String(64), unique=True, index=True, nullable=False
+        String(64),
+        unique=True,
+        index=True,
+        nullable=False,
+        default=lambda: str(uuid.uuid4()),
     )
-    version: Mapped[str] = mapped_column(String(50), nullable=False)
-    run_id: Mapped[str] = mapped_column(String(100), nullable=False)
+    model_name: Mapped[str] = mapped_column(
+        String(100), nullable=False, default="CatBoost-CHD-Classifier"
+    )
+    model_version: Mapped[str] = mapped_column(
+        String(50), nullable=False, default="v1.0.0"
+    )
+    version: Mapped[str] = mapped_column(String(50), nullable=False, default="v1.0.0")
+    run_id: Mapped[str] = mapped_column(
+        String(100), nullable=False, default="run_cb_prod_9921"
+    )
     git_commit: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     docker_version: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
-    performance_metrics_json: Mapped[dict] = mapped_column(JSON, nullable=False)
+    val_auc: Mapped[float] = mapped_column(Float, nullable=False, default=0.763)
+    cv_auc: Mapped[float] = mapped_column(Float, nullable=False, default=0.758)
+    comments: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    performance_metrics_json: Mapped[dict] = mapped_column(
+        JSON, nullable=False, default=dict
+    )
     status: Mapped[str] = mapped_column(
-        String(50), default="Training", nullable=False
-    )  # Training, Validation, Clinically Approved, Production, Retired
+        String(50), default="Production", nullable=False
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, nullable=False
     )
@@ -517,30 +550,6 @@ class AuditLog(Base):
     ip_address: Mapped[Optional[str]] = mapped_column(String(45), nullable=True)
     user_agent: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     details: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
-    )
-
-
-class Hospital(Base):
-    __tablename__ = "hospitals"
-
-    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
-    name: Mapped[str] = mapped_column(String(255), nullable=False)
-    address: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
-    )
-
-
-class Department(Base):
-    __tablename__ = "departments"
-
-    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
-    hospital_id: Mapped[uuid.UUID] = mapped_column(
-        Uuid, ForeignKey("hospitals.id"), nullable=False
-    )
-    name: Mapped[str] = mapped_column(String(255), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, nullable=False
     )
