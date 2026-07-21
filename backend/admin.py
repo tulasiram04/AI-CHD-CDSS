@@ -271,33 +271,6 @@ def list_hospitals(
                 total_beds=450,
                 icu_beds=60,
             ),
-            Hospital(
-                name="General Care Medical Center",
-                code="GMC-02",
-                city="New York",
-                state="NY",
-                status="Active",
-                total_beds=620,
-                icu_beds=85,
-            ),
-            Hospital(
-                name="University Cardiology Institute",
-                code="UCI-03",
-                city="Chicago",
-                state="IL",
-                status="Active",
-                total_beds=380,
-                icu_beds=50,
-            ),
-            Hospital(
-                name="Pacific Critical Care Hospital",
-                code="PCH-04",
-                city="San Francisco",
-                state="CA",
-                status="Active",
-                total_beds=500,
-                icu_beds=70,
-            ),
         ]
         for h in default_hospitals:
             db.add(h)
