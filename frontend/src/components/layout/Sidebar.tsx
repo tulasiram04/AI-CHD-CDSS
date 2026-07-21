@@ -16,7 +16,8 @@ import {
   Info,
   LogOut,
   Stethoscope,
-  UserCheck
+  UserCheck,
+  ShieldCheck
 } from "lucide-react";
 
 const getRoleLabel = (role: string) => {
@@ -132,6 +133,21 @@ export default function Sidebar() {
             );
           })}
         </nav>
+
+        {/* Super Admin Switcher for Admin Roles */}
+        {["admin", "super_admin"].includes(user?.role?.toLowerCase() || "") && (
+          <div className="pt-2">
+            <Link
+              href="/admin/dashboard"
+              className="flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-indigo-600 via-blue-600 to-blue-700 text-white shadow-md hover:shadow-lg transition group"
+            >
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-indigo-200" />
+                <span>Super Admin Portal</span>
+              </div>
+            </Link>
+          </div>
+        )}
       </div>
 
       {/* Footer Profile & Logout */}

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Search, Bell, Shield, ChevronDown, LogOut, CheckCircle2,
-  Building2, Sparkles, RefreshCw, Cpu, Activity, User
+  Building2, Sparkles, RefreshCw, Cpu, Activity, User, Stethoscope
 } from "lucide-react";
 
 export default function AdminNavbar() {
@@ -38,6 +38,14 @@ export default function AdminNavbar() {
 
       {/* Right Controls */}
       <div className="flex items-center gap-4">
+        {/* Doctor Portal Switcher */}
+        <Link
+          href="/dashboard"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white rounded-xl text-xs font-extrabold shadow-sm transition"
+        >
+          <Stethoscope className="h-4 w-4 text-blue-200" />
+          <span>Doctor Workspace</span>
+        </Link>
         {/* System Health Pill */}
         <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-emerald-50 border border-emerald-200/60 rounded-full text-emerald-700 text-xs font-extrabold shadow-xs">
           <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />

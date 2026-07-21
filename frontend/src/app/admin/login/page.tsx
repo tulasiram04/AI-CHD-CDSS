@@ -33,13 +33,12 @@ export default function AdminLoginPage() {
       const data = await res.json();
       localStorage.setItem("admin_token", data.access_token);
       localStorage.setItem("admin_user", JSON.stringify(data.user));
+      localStorage.setItem("token", data.access_token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
       router.push("/admin/dashboard");
     } catch (err: any) {
-      // Fallback preview login for development
-      localStorage.setItem("admin_token", "demo_admin_jwt_token_2026");
-      localStorage.setItem("admin_user", JSON.stringify({ email, role: "super_admin" }));
-      router.push("/admin/dashboard");
+      setErrorMessage(err.message || "Invalid Super Admin credentials.");
     } finally {
       setIsLoading(false);
     }
