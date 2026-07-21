@@ -194,12 +194,8 @@ def get_dashboard_stats(
     )
 
     # Hospitals & Departments count
-    hospitals_count = db.query(Hospital).count()
-    if hospitals_count == 0:
-        hospitals_count = 4  # Default baseline count
-    departments_count = db.query(Department).count()
-    if departments_count == 0:
-        departments_count = 12
+    hospitals_count = db.query(Hospital).filter(Hospital.is_deleted == False).count()
+    departments_count = db.query(Department).filter(Department.is_deleted == False).count()
 
     # System Health Metrics via psutil (with fallback)
     cpu_percent = psutil.cpu_percent(interval=None) if psutil else 12.4
@@ -313,6 +309,24 @@ def get_hospital_details(
         .count()
     )
 
+    first_doctor = (
+        db.query(User)
+        .filter(User.role == "doctor", User.is_deleted == False)
+        .first()
+    )
+    director_name = (
+        f"Dr. {first_doctor.full_name}"
+        if first_doctor and first_doctor.full_name
+        else (first_doctor.email if first_doctor else "Unassigned Clinician")
+    )
+
+    admin_user = (
+        db.query(User)
+        .filter(User.role.in_(["admin", "super_admin"]), User.is_deleted == False)
+        .first()
+    )
+    governance_name = admin_user.email if admin_user else "System Administrator"
+
     return {
         "id": str(hospital.id),
         "name": hospital.name,
@@ -322,19 +336,19 @@ def get_hospital_details(
         "status": hospital.status,
         "total_beds": hospital.total_beds,
         "icu_beds": hospital.icu_beds,
-        "facility_type": "Tertiary Cardiac Command Center",
-        "emergency_phone": "+1 (800) 555-CARDIO",
-        "director": "Dr. Alexander Vance, MD, FACC",
-        "governance_officer": "Dr. Sarah Jenkins, MD",
-        "total_doctors": total_doctors or 6,
-        "total_patients": total_patients or 5,
-        "total_predictions": total_predictions or 3,
+        "facility_type": "Primary Medical Facility",
+        "emergency_phone": f"Hospital Center ({hospital.code})",
+        "director": director_name,
+        "governance_officer": governance_name,
+        "total_doctors": total_doctors,
+        "total_patients": total_patients,
+        "total_predictions": total_predictions,
         "departments": [
             {
                 "id": str(d.id),
                 "name": d.name,
                 "code": d.code,
-                "head_clinician": d.head_clinician,
+                "head_clinician": d.head_clinician or "Head Clinician",
                 "status": d.status,
             }
             for d in departments

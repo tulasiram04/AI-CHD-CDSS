@@ -28,22 +28,13 @@ export default function AdminHospitalsPage() {
       const res = await api.get(`/api/v1/admin/hospitals/${h.id}`);
       setHospitalDetails(res.data);
     } catch (err) {
+      console.error("Error loading hospital details from backend:", err);
       setHospitalDetails({
         ...h,
-        facility_type: "Tertiary Cardiac Command Center",
-        emergency_phone: "+1 (800) 555-CARDIO",
-        director: "Dr. Alexander Vance, MD, FACC",
-        governance_officer: "Dr. Sarah Jenkins, MD",
-        total_doctors: 109,
-        total_patients: 1820,
-        total_predictions: 4890,
-        departments: [
-          { name: "Cardiology & CCU", code: "CARD-01", head_clinician: "Dr. Alexander Vance, MD", status: "Active" },
-          { name: "Intensive Care Unit (ICU)", code: "ICU-02", head_clinician: "Dr. Sarah Jenkins, MD", status: "Active" },
-          { name: "Emergency Medicine (ER)", code: "EM-03", head_clinician: "Dr. Marcus Thorne, MD", status: "Active" },
-          { name: "Outpatient Cardiology (OPD)", code: "OPD-04", head_clinician: "Dr. Elena Rostova, MD", status: "Active" },
-          { name: "Cardiovascular Surgery", code: "CVS-05", head_clinician: "Dr. David Chang, MD", status: "Active" }
-        ]
+        total_doctors: 0,
+        total_patients: 0,
+        total_predictions: 0,
+        departments: []
       });
     } finally {
       setIsLoadingDetails(false);
@@ -60,7 +51,7 @@ export default function AdminHospitalsPage() {
             Click any hospital facility to inspect clinical wards, staff allocations, and telemetry details
           </p>
         </div>
-        <GlassButton variant="primary" size="sm" className="px-4 py-2 font-bold text-xs flex items-center gap-2">
+        <GlassButton variant="primary" size="sm" className="px-4 py-2 font-bold text-xs flex items-center gap-2 cursor-pointer">
           <Plus className="h-4 w-4" />
           <span>Add Hospital Branch</span>
         </GlassButton>
@@ -142,7 +133,7 @@ export default function AdminHospitalsPage() {
             {isLoadingDetails ? (
               <div className="py-12 flex flex-col items-center justify-center space-y-3 text-slate-400">
                 <Activity className="h-8 w-8 animate-spin text-indigo-600" />
-                <span className="text-xs font-bold">Loading facility telemetry & department records...</span>
+                <span className="text-xs font-bold">Loading PostgreSQL facility telemetry & department records...</span>
               </div>
             ) : (
               <div className="space-y-6">
@@ -157,7 +148,7 @@ export default function AdminHospitalsPage() {
                   <div className="p-4 rounded-2xl bg-blue-50/60 border border-blue-100">
                     <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest block">Medical Staff</span>
                     <span className="text-lg font-black text-slate-900 mt-1 block">
-                      {hospitalDetails?.total_doctors || 109} Doctors
+                      {hospitalDetails?.total_doctors ?? 0} Doctors
                     </span>
                     <span className="text-[10px] font-extrabold text-blue-500">Active Physicians</span>
                   </div>
@@ -165,7 +156,7 @@ export default function AdminHospitalsPage() {
                   <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-100">
                     <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest block">Patients Registered</span>
                     <span className="text-lg font-black text-slate-900 mt-1 block">
-                      {hospitalDetails?.total_patients || 1820}
+                      {hospitalDetails?.total_patients ?? 0}
                     </span>
                     <span className="text-[10px] font-extrabold text-emerald-500">PostgreSQL Synchronized</span>
                   </div>
@@ -173,7 +164,7 @@ export default function AdminHospitalsPage() {
                   <div className="p-4 rounded-2xl bg-purple-50/60 border border-purple-100">
                     <span className="text-[10px] font-black text-purple-600 uppercase tracking-widest block">AI Predictions</span>
                     <span className="text-lg font-black text-slate-900 mt-1 block">
-                      {hospitalDetails?.total_predictions || 4890}
+                      {hospitalDetails?.total_predictions ?? 0}
                     </span>
                     <span className="text-[10px] font-extrabold text-purple-500">v1.0.0 CatBoost Active</span>
                   </div>
@@ -188,15 +179,15 @@ export default function AdminHospitalsPage() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs font-semibold">
                     <div>
                       <span className="text-[10px] text-slate-400 font-bold block">Medical Director</span>
-                      <span className="text-slate-800 font-bold">{hospitalDetails?.director || "Dr. Alexander Vance, MD, FACC"}</span>
+                      <span className="text-slate-800 font-bold">{hospitalDetails?.director || "Chief Medical Officer"}</span>
                     </div>
                     <div>
                       <span className="text-[10px] text-slate-400 font-bold block">Governance Officer</span>
-                      <span className="text-slate-800 font-bold">{hospitalDetails?.governance_officer || "Dr. Sarah Jenkins, MD"}</span>
+                      <span className="text-slate-800 font-bold">{hospitalDetails?.governance_officer || "Super Admin"}</span>
                     </div>
                     <div>
                       <span className="text-[10px] text-slate-400 font-bold block">Emergency Hotline</span>
-                      <span className="text-indigo-600 font-extrabold">{hospitalDetails?.emergency_phone || "+1 (800) 555-CARDIO"}</span>
+                      <span className="text-indigo-600 font-extrabold">{hospitalDetails?.emergency_phone || "Hospital Admin Office"}</span>
                     </div>
                   </div>
                 </div>
@@ -208,35 +199,35 @@ export default function AdminHospitalsPage() {
                     <span>Active Clinical Wards & Specializations</span>
                   </h3>
 
-                  <div className="space-y-2">
-                    {(hospitalDetails?.departments || [
-                      { name: "Cardiology & CCU", code: "CARD-01", head_clinician: "Dr. Alexander Vance, MD", status: "Active" },
-                      { name: "Intensive Care Unit (ICU)", code: "ICU-02", head_clinician: "Dr. Sarah Jenkins, MD", status: "Active" },
-                      { name: "Emergency Medicine (ER)", code: "EM-03", head_clinician: "Dr. Marcus Thorne, MD", status: "Active" },
-                      { name: "Outpatient Cardiology (OPD)", code: "OPD-04", head_clinician: "Dr. Elena Rostova, MD", status: "Active" },
-                      { name: "Cardiovascular Surgery", code: "CVS-05", head_clinician: "Dr. David Chang, MD", status: "Active" }
-                    ]).map((dept: any, idx: number) => (
-                      <div key={idx} className="flex justify-between items-center p-3 rounded-xl bg-white border border-slate-200/70 hover:border-indigo-200 transition">
-                        <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs">
-                            <Stethoscope className="h-4 w-4" />
+                  {hospitalDetails?.departments && hospitalDetails.departments.length > 0 ? (
+                    <div className="space-y-2">
+                      {hospitalDetails.departments.map((dept: any, idx: number) => (
+                        <div key={idx} className="flex justify-between items-center p-3 rounded-xl bg-white border border-slate-200/70 hover:border-indigo-200 transition">
+                          <div className="flex items-center gap-3">
+                            <div className="h-8 w-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs">
+                              <Stethoscope className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <span className="font-extrabold text-xs text-slate-900 block">{dept.name}</span>
+                              <span className="text-[10px] text-slate-400 font-bold">Head: {dept.head_clinician || "Head Clinician Assigned"}</span>
+                            </div>
                           </div>
-                          <div>
-                            <span className="font-extrabold text-xs text-slate-900 block">{dept.name}</span>
-                            <span className="text-[10px] text-slate-400 font-bold">Head: {dept.head_clinician || "Head Clinician Assigned"}</span>
+                          <div className="flex items-center gap-3">
+                            <span className="text-[10px] font-black text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md">
+                              {dept.code}
+                            </span>
+                            <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                              {dept.status || "Active"}
+                            </span>
                           </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                          <span className="text-[10px] font-black text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md">
-                            {dept.code}
-                          </span>
-                          <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                            {dept.status || "Active"}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-6 text-center text-slate-400 text-xs font-bold bg-slate-50 border border-slate-200/60 rounded-2xl">
+                      No clinical departments registered for this hospital facility.
+                    </div>
+                  )}
                 </div>
 
                 {/* Footer Controls */}
