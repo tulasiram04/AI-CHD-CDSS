@@ -647,3 +647,23 @@ class Department(Base, AuditableMixin):
     head_clinician: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     status: Mapped[str] = mapped_column(String(50), default="Active", nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+
+class Notification(Base, AuditableMixin):
+    __tablename__ = "notifications"
+    __table_args__ = {"extend_existing": True}
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        Uuid, ForeignKey("users.id"), nullable=True
+    )
+    recipient_role: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    type: Mapped[str] = mapped_column(String(50), nullable=False)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    message: Mapped[str] = mapped_column(Text, nullable=False)
+    is_read: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, nullable=False
+    )
+
+    user = relationship("User", back_populates="notifications", foreign_keys=[user_id])
