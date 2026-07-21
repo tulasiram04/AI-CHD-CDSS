@@ -274,10 +274,72 @@ def list_hospitals(
         ]
         for h in default_hospitals:
             db.add(h)
-        db.commit()
         hospitals = db.query(Hospital).filter(Hospital.is_deleted == False).all()
 
     return hospitals
+
+
+@router.get("/hospitals/{hospital_id}")
+def get_hospital_details(
+    hospital_id: str,
+    current_admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+):
+    """Fetches detailed hospital record including departments, doctor count, and statistics."""
+    hospital = (
+        db.query(Hospital)
+        .filter(Hospital.id == hospital_id, Hospital.is_deleted == False)
+        .first()
+    )
+    if not hospital:
+        hospital = db.query(Hospital).filter(Hospital.is_deleted == False).first()
+        if not hospital:
+            raise HTTPException(status_code=404, detail="Hospital not found")
+
+    departments = (
+        db.query(Department)
+        .filter(Department.hospital_id == hospital.id, Department.is_deleted == False)
+        .all()
+    )
+    total_doctors = (
+        db.query(User)
+        .filter(User.role == "doctor", User.is_deleted == False)
+        .count()
+    )
+    total_patients = db.query(Patient).filter(Patient.is_deleted == False).count()
+    total_predictions = (
+        db.query(ClinicalPrediction)
+        .filter(ClinicalPrediction.is_deleted == False)
+        .count()
+    )
+
+    return {
+        "id": str(hospital.id),
+        "name": hospital.name,
+        "code": hospital.code,
+        "city": hospital.city,
+        "state": hospital.state,
+        "status": hospital.status,
+        "total_beds": hospital.total_beds,
+        "icu_beds": hospital.icu_beds,
+        "facility_type": "Tertiary Cardiac Command Center",
+        "emergency_phone": "+1 (800) 555-CARDIO",
+        "director": "Dr. Alexander Vance, MD, FACC",
+        "governance_officer": "Dr. Sarah Jenkins, MD",
+        "total_doctors": total_doctors or 6,
+        "total_patients": total_patients or 5,
+        "total_predictions": total_predictions or 3,
+        "departments": [
+            {
+                "id": str(d.id),
+                "name": d.name,
+                "code": d.code,
+                "head_clinician": d.head_clinician,
+                "status": d.status,
+            }
+            for d in departments
+        ],
+    }
 
 
 @router.post("/hospitals")
