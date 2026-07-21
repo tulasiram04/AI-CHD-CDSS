@@ -4,37 +4,26 @@ import React, { useEffect, useState } from "react";
 import { UserCheck, CheckCircle2, XCircle, Clock, AlertCircle } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
 import GlassButton from "@/components/ui/GlassButton";
+import { api } from "@/lib/api";
 
 export default function AdminApprovalsPage() {
   const [approvals, setApprovals] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch("/api/v1/admin/approvals", {
-      headers: { "Authorization": `Bearer ${localStorage.getItem("admin_token") || ""}` }
-    })
-      .then(res => res.json())
-      .then(data => setApprovals(Array.isArray(data) ? data : []))
-      .catch(() => {
-        setApprovals([
-          { id: "1", full_name: "Dr. Jonathan Hayes", email: "jhayes@hospital.org", requested_role: "doctor", specialization: "Cardiology", license_number: "MD-881122", status: "Pending" },
-          { id: "2", full_name: "Nurse Rebecca Stone", email: "rstone@hospital.org", requested_role: "nurse", specialization: "ICU Nursing", license_number: "RN-993344", status: "Pending" }
-        ]);
-      });
+    api.get("/api/v1/admin/approvals")
+      .then(res => setApprovals(Array.isArray(res.data) ? res.data : []))
+      .catch(err => console.error("Error loading approvals:", err));
   }, []);
 
   const handleAction = async (id: string, action: string) => {
     try {
-      await fetch(`/api/v1/admin/approvals/${id}/action`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("admin_token") || ""}`
-        },
-        body: JSON.stringify({ action, notes: `Processed by Super Admin (${action})` })
+      await api.post(`/api/v1/admin/approvals/${id}/action`, {
+        action,
+        notes: `Processed by Super Admin (${action})`
       });
       setApprovals(approvals.map(a => a.id === id ? { ...a, status: action === "Approve" ? "Approved" : "Rejected" } : a));
     } catch (err) {
-      setApprovals(approvals.map(a => a.id === id ? { ...a, status: action === "Approve" ? "Approved" : "Rejected" } : a));
+      console.error("Error processing approval:", err);
     }
   };
 

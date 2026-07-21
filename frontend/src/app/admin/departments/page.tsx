@@ -4,24 +4,15 @@ import React, { useEffect, useState } from "react";
 import { Layers, Plus, Stethoscope, CheckCircle2 } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
 import GlassButton from "@/components/ui/GlassButton";
+import { api } from "@/lib/api";
 
 export default function AdminDepartmentsPage() {
   const [departments, setDepartments] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch("/api/v1/admin/departments", {
-      headers: { "Authorization": `Bearer ${localStorage.getItem("admin_token") || ""}` }
-    })
-      .then(res => res.json())
-      .then(data => setDepartments(Array.isArray(data) ? data : []))
-      .catch(() => {
-        setDepartments([
-          { id: "1", name: "Cardiology & CCU", code: "CARD-01", head_clinician: "Dr. Robert Vance, MD", status: "Active" },
-          { id: "2", name: "Intensive Care Unit (ICU)", code: "ICU-02", head_clinician: "Dr. Sarah Jenkins, MD", status: "Active" },
-          { id: "3", name: "Emergency Medicine (ER)", code: "EM-03", head_clinician: "Dr. Marcus Thorne, MD", status: "Active" },
-          { id: "4", name: "Outpatient Cardiology (OPD)", code: "OPD-04", head_clinician: "Dr. Elena Rostova, MD", status: "Active" }
-        ]);
-      });
+    api.get("/api/v1/admin/departments")
+      .then(res => setDepartments(Array.isArray(res.data) ? res.data : []))
+      .catch(err => console.error("Error loading departments:", err));
   }, []);
 
   return (

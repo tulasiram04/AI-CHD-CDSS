@@ -3,31 +3,15 @@
 import React, { useEffect, useState } from "react";
 import { Heart, Activity, Users, Filter, Search } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
+import { api } from "@/lib/api";
 
 export default function AdminPatientsPage() {
   const [data, setData] = useState<any>(null);
 
   useEffect(() => {
-    fetch("/api/v1/admin/analytics/patients", {
-      headers: { "Authorization": `Bearer ${localStorage.getItem("admin_token") || ""}` }
-    })
-      .then(res => res.json())
-      .then(d => setData(d))
-      .catch(() => {
-        setData({
-          total_patients: 1820,
-          critical_patients: 14,
-          recovered_patients: 182,
-          average_age: 61.4,
-          smoking_ratio_pct: 34.5,
-          diabetes_ratio_pct: 28.1,
-          hypertension_ratio_pct: 62.4,
-          obesity_ratio_pct: 31.8,
-          average_bmi: 27.6,
-          average_cholesterol: 215.4,
-          average_systolic_bp: 138.2
-        });
-      });
+    api.get("/api/v1/admin/analytics/patients")
+      .then(res => setData(res.data))
+      .catch(err => console.error("Error loading patient analytics:", err));
   }, []);
 
   return (

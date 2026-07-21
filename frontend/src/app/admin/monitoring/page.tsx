@@ -3,29 +3,15 @@
 import React, { useEffect, useState } from "react";
 import { Server, Cpu, HardDrive, ShieldCheck, Activity } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
+import { api } from "@/lib/api";
 
 export default function AdminMonitoringPage() {
   const [sys, setSys] = useState<any>(null);
 
   useEffect(() => {
-    fetch("/api/v1/admin/system/health", {
-      headers: { "Authorization": `Bearer ${localStorage.getItem("admin_token") || ""}` }
-    })
-      .then(res => res.json())
-      .then(d => setSys(d))
-      .catch(() => {
-        setSys({
-          cpu_usage_pct: 12.4,
-          ram_usage_pct: 42.1,
-          disk_usage_pct: 28.5,
-          cpu_cores: 8,
-          ram_total_gb: 16.0,
-          ram_used_gb: 6.7,
-          redis_status: "Connected & Healthy",
-          postgresql_status: "Connected (Active)",
-          fastapi_status: "Online (Uvicorn)"
-        });
-      });
+    api.get("/api/v1/admin/system/health")
+      .then(res => setSys(res.data))
+      .catch(err => console.error("Error loading system telemetry:", err));
   }, []);
 
   return (

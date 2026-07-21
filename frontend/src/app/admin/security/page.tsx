@@ -3,25 +3,15 @@
 import React, { useEffect, useState } from "react";
 import { Lock, ShieldCheck, Key, AlertTriangle } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
+import { api } from "@/lib/api";
 
 export default function AdminSecurityPage() {
   const [sec, setSec] = useState<any>(null);
 
   useEffect(() => {
-    fetch("/api/v1/admin/security/events", {
-      headers: { "Authorization": `Bearer ${localStorage.getItem("admin_token") || ""}` }
-    })
-      .then(res => res.json())
-      .then(d => setSec(d))
-      .catch(() => {
-        setSec({
-          failed_login_attempts_today: 0,
-          blocked_ips_count: 0,
-          active_jwt_sessions: 14,
-          password_resets_24h: 1,
-          security_score: 98
-        });
-      });
+    api.get("/api/v1/admin/security/events")
+      .then(res => setSec(res.data))
+      .catch(err => console.error("Error loading security events:", err));
   }, []);
 
   return (

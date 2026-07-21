@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { User, Shield, Key, Save, CheckCircle2 } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
 import GlassButton from "@/components/ui/GlassButton";
+import { api } from "@/lib/api";
 
 export default function AdminProfilePage() {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -15,24 +16,17 @@ export default function AdminProfilePage() {
     e.preventDefault();
     setMsg("Updating password...");
     try {
-      const res = await fetch("/api/v1/profile/password", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("admin_token") || ""}`
-        },
-        body: JSON.stringify({ current_password: currentPassword, new_password: newPassword, confirm_password: confirmPassword })
+      const res = await api.put("/api/v1/profile/password", {
+        current_password: currentPassword,
+        new_password: newPassword,
+        confirm_password: confirmPassword
       });
-      if (res.ok) {
-        setMsg("Password updated successfully in PostgreSQL.");
-        setCurrentPassword("");
-        setNewPassword("");
-        setConfirmPassword("");
-      } else {
-        setMsg("Failed to update password. Please check current password.");
-      }
-    } catch (err) {
-      setMsg("Password update queued successfully.");
+      setMsg("Password updated successfully in PostgreSQL.");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err: any) {
+      setMsg("Failed to update password: " + (err.response?.data?.detail || err.message));
     }
   };
 

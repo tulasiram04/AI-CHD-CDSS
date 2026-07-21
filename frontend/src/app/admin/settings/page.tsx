@@ -4,25 +4,15 @@ import React, { useEffect, useState } from "react";
 import { Settings, Shield, Sliders, Bell, Save } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
 import GlassButton from "@/components/ui/GlassButton";
+import { api } from "@/lib/api";
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<any>(null);
 
   useEffect(() => {
-    fetch("/api/v1/admin/settings", {
-      headers: { "Authorization": `Bearer ${localStorage.getItem("admin_token") || ""}` }
-    })
-      .then(res => res.json())
-      .then(d => setSettings(d))
-      .catch(() => {
-        setSettings({
-          hospital_name: "AI-CHD-CDSS Enterprise Network",
-          high_risk_threshold_pct: 20.0,
-          very_high_risk_threshold_pct: 40.0,
-          jwt_expiry_minutes: 60,
-          auto_backup_daily: true
-        });
-      });
+    api.get("/api/v1/admin/settings")
+      .then(res => setSettings(res.data))
+      .catch(err => console.error("Error loading admin settings:", err));
   }, []);
 
   return (

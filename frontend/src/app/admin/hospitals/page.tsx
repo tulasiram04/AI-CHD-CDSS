@@ -4,24 +4,15 @@ import React, { useEffect, useState } from "react";
 import { Building2, Plus, Search, MapPin, BedDouble, CheckCircle2, Shield } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
 import GlassButton from "@/components/ui/GlassButton";
+import { api } from "@/lib/api";
 
 export default function AdminHospitalsPage() {
   const [hospitals, setHospitals] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch("/api/v1/admin/hospitals", {
-      headers: { "Authorization": `Bearer ${localStorage.getItem("admin_token") || ""}` }
-    })
-      .then(res => res.json())
-      .then(data => setHospitals(Array.isArray(data) ? data : []))
-      .catch(() => {
-        setHospitals([
-          { id: "1", name: "St. Jude Memorial Hospital", code: "SJH-01", city: "Boston", state: "MA", status: "Active", total_beds: 450, icu_beds: 60 },
-          { id: "2", name: "General Care Medical Center", code: "GMC-02", city: "New York", state: "NY", status: "Active", total_beds: 620, icu_beds: 85 },
-          { id: "3", name: "University Cardiology Institute", code: "UCI-03", city: "Chicago", state: "IL", status: "Active", total_beds: 380, icu_beds: 50 },
-          { id: "4", name: "Pacific Critical Care Hospital", code: "PCH-04", city: "San Francisco", state: "CA", status: "Active", total_beds: 500, icu_beds: 70 }
-        ]);
-      });
+    api.get("/api/v1/admin/hospitals")
+      .then(res => setHospitals(Array.isArray(res.data) ? res.data : []))
+      .catch(err => console.error("Error loading hospitals:", err));
   }, []);
 
   return (

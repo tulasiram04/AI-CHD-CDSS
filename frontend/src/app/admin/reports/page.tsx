@@ -4,24 +4,15 @@ import React, { useEffect, useState } from "react";
 import { FileSpreadsheet, Download, FileText, CheckCircle2 } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
 import GlassButton from "@/components/ui/GlassButton";
+import { api } from "@/lib/api";
 
 export default function AdminReportsPage() {
   const [reports, setReports] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch("/api/v1/admin/reports", {
-      headers: { "Authorization": `Bearer ${localStorage.getItem("admin_token") || ""}` }
-    })
-      .then(res => res.json())
-      .then(data => setReports(Array.isArray(data) ? data : []))
-      .catch(() => {
-        setReports([
-          { id: "rep_01", name: "Hospital-wide Clinical Prediction Summary", type: "Executive Chart", date: "2026-07-20", status: "Ready" },
-          { id: "rep_02", name: "AI Model Governance & Calibration Report", type: "ML Governance", date: "2026-07-20", status: "Ready" },
-          { id: "rep_03", name: "System Audit Trail & Access Log", type: "Compliance", date: "2026-07-20", status: "Ready" },
-          { id: "rep_04", name: "Patient Risk Stratification Population Breakdown", type: "Epidemiology", date: "2026-07-20", status: "Ready" },
-        ]);
-      });
+    api.get("/api/v1/admin/reports")
+      .then(res => setReports(Array.isArray(res.data) ? res.data : []))
+      .catch(err => console.error("Error loading reports:", err));
   }, []);
 
   return (

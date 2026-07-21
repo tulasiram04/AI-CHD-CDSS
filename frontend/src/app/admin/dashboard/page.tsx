@@ -40,58 +40,18 @@ const hospitalComparisonData = [
   { hospital: "Pacific Critical Care", predictions: 480, activeDoctors: 29 },
 ];
 
+import { api } from "@/lib/api";
+
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchStats = async () => {
     try {
-      const res = await fetch("/api/v1/admin/dashboard/stats", {
-        headers: { "Authorization": `Bearer ${localStorage.getItem("admin_token") || ""}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setStats(data);
-      } else {
-        throw new Error("Failed to fetch");
-      }
+      const { data } = await api.get("/api/v1/admin/dashboard/stats");
+      setStats(data);
     } catch (err) {
-      // Fallback telemetry data for UI preview
-      setStats({
-        total_hospitals: 4,
-        total_departments: 12,
-        total_doctors: 109,
-        total_nurses: 184,
-        total_lab_techs: 42,
-        total_researchers: 15,
-        total_users: 360,
-        pending_registrations: 3,
-        registered_patients: 1820,
-        total_predictions: 4890,
-        predictions_today: 180,
-        predictions_week: 1312,
-        predictions_month: 4890,
-        average_chd_risk_pct: 14.2,
-        high_risk_patients: 120,
-        very_high_risk_patients: 65,
-        ai_model: {
-          active_version: "v1.0.0 (CatBoost)",
-          validation_auc: 0.763,
-          avg_inference_latency_ms: 14.8,
-          accuracy_pct: 94.2
-        },
-        system_health: {
-          status: "Healthy",
-          cpu_usage_pct: 12.4,
-          memory_usage_pct: 42.1,
-          disk_usage_pct: 28.5,
-          uptime_seconds: 345600,
-          database_status: "Connected (PostgreSQL 16)",
-          redis_status: "Healthy",
-          bg_workers: 4,
-          overall_health_score: 99.4
-        }
-      });
+      console.error("Failed to fetch admin stats from PostgreSQL:", err);
     } finally {
       setIsLoading(false);
     }

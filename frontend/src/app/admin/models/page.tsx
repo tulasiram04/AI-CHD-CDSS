@@ -4,33 +4,23 @@ import React, { useEffect, useState } from "react";
 import { Cpu, CheckCircle2, Shield, Activity, Layers } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
 import GlassButton from "@/components/ui/GlassButton";
+import { api } from "@/lib/api";
 
 export default function AdminModelsPage() {
   const [models, setModels] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch("/api/v1/admin/models", {
-      headers: { "Authorization": `Bearer ${localStorage.getItem("admin_token") || ""}` }
-    })
-      .then(res => res.json())
-      .then(data => setModels(Array.isArray(data) ? data : []))
-      .catch(() => {
-        setModels([
-          { id: "1", model_name: "CatBoost-CHD-Classifier", model_version: "v1.0.0", run_id: "run_cb_prod_9921", val_auc: 0.763, cv_auc: 0.758, status: "Production", comments: "Production calibrated model with Isotonic scaling." },
-          { id: "2", model_name: "XGBoost-CHD-Staging", model_version: "v1.1.0-rc1", run_id: "run_xgb_stage_102", val_auc: 0.771, cv_auc: 0.764, status: "Staging", comments: "Candidate model trained on expanded MIMIC-IV cohort." }
-        ]);
-      });
+    api.get("/api/v1/admin/models")
+      .then(res => setModels(Array.isArray(res.data) ? res.data : []))
+      .catch(err => console.error("Error loading models:", err));
   }, []);
 
   const handleActivate = async (id: string) => {
     try {
-      await fetch(`/api/v1/admin/models/${id}/activate`, {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${localStorage.getItem("admin_token") || ""}` }
-      });
+      await api.post(`/api/v1/admin/models/${id}/activate`);
       setModels(models.map(m => m.id === id ? { ...m, status: "Production" } : { ...m, status: "Archived" }));
     } catch (err) {
-      setModels(models.map(m => m.id === id ? { ...m, status: "Production" } : { ...m, status: "Archived" }));
+      console.error("Error activating model:", err);
     }
   };
 

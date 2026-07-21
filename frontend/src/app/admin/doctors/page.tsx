@@ -3,22 +3,15 @@
 import React, { useEffect, useState } from "react";
 import { Stethoscope, UserCheck, ShieldAlert, Key, CheckCircle2 } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
+import { api } from "@/lib/api";
 
 export default function AdminDoctorsPage() {
   const [doctors, setDoctors] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch("/api/v1/admin/users?role=doctor", {
-      headers: { "Authorization": `Bearer ${localStorage.getItem("admin_token") || ""}` }
-    })
-      .then(res => res.json())
-      .then(data => setDoctors(Array.isArray(data) ? data : []))
-      .catch(() => {
-        setDoctors([
-          { id: "1", email: "doctor@hospital.org", full_name: "Dr. Alexander Vance", specialty: "Cardiology", license_number: "MD-998877", department: "Coronary Care Unit (CCU)", is_active: true },
-          { id: "2", email: "cardio@hospital.org", full_name: "Dr. Sarah Jenkins", specialty: "Cardiovascular Surgery", license_number: "MD-443322", department: "Intensive Care Unit (ICU)", is_active: true },
-        ]);
-      });
+    api.get("/api/v1/admin/users?role=doctor")
+      .then(res => setDoctors(Array.isArray(res.data) ? res.data : []))
+      .catch(err => console.error("Error loading doctors:", err));
   }, []);
 
   return (

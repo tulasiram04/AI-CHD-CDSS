@@ -3,26 +3,15 @@
 import React, { useEffect, useState } from "react";
 import { Database, Server, Activity, CheckCircle2 } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
+import { api } from "@/lib/api";
 
 export default function AdminDatabasePage() {
   const [dbInfo, setDbInfo] = useState<any>(null);
 
   useEffect(() => {
-    fetch("/api/v1/admin/system/database", {
-      headers: { "Authorization": `Bearer ${localStorage.getItem("admin_token") || ""}` }
-    })
-      .then(res => res.json())
-      .then(d => setDbInfo(d))
-      .catch(() => {
-        setDbInfo({
-          database_engine: "PostgreSQL 16",
-          database_size_mb: 42.8,
-          active_connections: 8,
-          max_connections: 100,
-          slow_queries_count: 0,
-          migration_status: "Up to Date (head)"
-        });
-      });
+    api.get("/api/v1/admin/system/database")
+      .then(res => setDbInfo(res.data))
+      .catch(err => console.error("Error loading database telemetry:", err));
   }, []);
 
   return (

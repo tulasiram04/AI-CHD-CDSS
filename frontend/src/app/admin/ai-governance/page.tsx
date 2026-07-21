@@ -3,26 +3,15 @@
 import React, { useEffect, useState } from "react";
 import { ShieldCheck, Activity, LineChart, AlertCircle } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
+import { api } from "@/lib/api";
 
 export default function AdminAiGovernancePage() {
   const [gov, setGov] = useState<any>(null);
 
   useEffect(() => {
-    fetch("/api/v1/admin/governance/drift", {
-      headers: { "Authorization": `Bearer ${localStorage.getItem("admin_token") || ""}` }
-    })
-      .then(res => res.json())
-      .then(d => setGov(d))
-      .catch(() => {
-        setGov({
-          model_drift_score: 0.024,
-          data_drift_score: 0.018,
-          calibration_status: "Well Calibrated (Platt Scaling)",
-          prediction_drift_pct: 1.2,
-          feature_drift_status: "No Drift Detected",
-          fairness_metrics: { gender_disparity_ratio: 1.02, age_group_balance_score: 0.98 }
-        });
-      });
+    api.get("/api/v1/admin/governance/drift")
+      .then(res => setGov(res.data))
+      .catch(err => console.error("Error loading governance metrics:", err));
   }, []);
 
   return (

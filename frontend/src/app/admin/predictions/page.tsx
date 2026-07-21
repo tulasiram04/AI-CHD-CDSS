@@ -3,28 +3,15 @@
 import React, { useEffect, useState } from "react";
 import { Activity, Clock, CheckCircle2, AlertTriangle, Zap } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
+import { api } from "@/lib/api";
 
 export default function AdminPredictionsPage() {
   const [feed, setFeed] = useState<any>(null);
 
   useEffect(() => {
-    fetch("/api/v1/admin/predictions/feed", {
-      headers: { "Authorization": `Bearer ${localStorage.getItem("admin_token") || ""}` }
-    })
-      .then(res => res.json())
-      .then(d => setFeed(d))
-      .catch(() => {
-        setFeed({
-          recent_predictions: [
-            { id: "1", patient_uuid: "p-9901-4421", predicted_risk_pct: 71.7, risk_level: "High Risk", latency_ms: 14.2, timestamp: "2026-07-20T07:48:00Z" },
-            { id: "2", patient_uuid: "p-8812-1029", predicted_risk_pct: 1.2, risk_level: "Very Low Risk", latency_ms: 12.8, timestamp: "2026-07-20T07:49:00Z" },
-            { id: "3", patient_uuid: "p-7714-3320", predicted_risk_pct: 98.8, risk_level: "Very High Risk", latency_ms: 15.6, timestamp: "2026-07-20T06:36:00Z" },
-          ],
-          prediction_volume_today: 180,
-          success_rate_pct: 99.8,
-          average_latency_ms: 14.8
-        });
-      });
+    api.get("/api/v1/admin/predictions/feed")
+      .then(res => setFeed(res.data))
+      .catch(err => console.error("Error loading prediction feed:", err));
   }, []);
 
   return (

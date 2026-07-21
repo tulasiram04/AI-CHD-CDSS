@@ -3,23 +3,15 @@
 import React, { useEffect, useState } from "react";
 import { History, Shield, Search } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
+import { api } from "@/lib/api";
 
 export default function AdminAuditLogsPage() {
   const [logs, setLogs] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch("/api/v1/admin/audit-logs", {
-      headers: { "Authorization": `Bearer ${localStorage.getItem("admin_token") || ""}` }
-    })
-      .then(res => res.json())
-      .then(data => setLogs(Array.isArray(data) ? data : []))
-      .catch(() => {
-        setLogs([
-          { id: "1", activity_type: "Password Changed", details: "Super Admin updated password", timestamp: "2026-07-20T08:00:00Z" },
-          { id: "2", activity_type: "Model Promoted", details: "CatBoost-CHD-Classifier promoted to Production", timestamp: "2026-07-20T07:30:00Z" },
-          { id: "3", activity_type: "Prediction Run", details: "Generated CHD prediction (1.2% Very Low)", timestamp: "2026-07-20T07:49:00Z" },
-        ]);
-      });
+    api.get("/api/v1/admin/audit-logs")
+      .then(res => setLogs(Array.isArray(res.data) ? res.data : []))
+      .catch(err => console.error("Error loading audit logs:", err));
   }, []);
 
   return (

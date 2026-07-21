@@ -3,26 +3,15 @@
 import React, { useEffect, useState } from "react";
 import { Radio, Activity, Zap, CheckCircle2 } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
+import { api } from "@/lib/api";
 
 export default function AdminApiMonitoringPage() {
   const [apiStats, setApiStats] = useState<any>(null);
 
   useEffect(() => {
-    fetch("/api/v1/admin/system/api-stats", {
-      headers: { "Authorization": `Bearer ${localStorage.getItem("admin_token") || ""}` }
-    })
-      .then(res => res.json())
-      .then(d => setApiStats(d))
-      .catch(() => {
-        setApiStats({
-          requests_per_minute: 142,
-          average_response_time_ms: 18.4,
-          http_200_count: 14820,
-          http_400_count: 12,
-          http_500_count: 0,
-          uptime_percentage: 99.98
-        });
-      });
+    api.get("/api/v1/admin/system/api-stats")
+      .then(res => setApiStats(res.data))
+      .catch(err => console.error("Error loading API telemetry:", err));
   }, []);
 
   return (

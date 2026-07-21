@@ -3,25 +3,15 @@
 import React, { useEffect, useState } from "react";
 import { Users, Shield, UserCheck, Key, Lock } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
+import { api } from "@/lib/api";
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch("/api/v1/admin/users", {
-      headers: { "Authorization": `Bearer ${localStorage.getItem("admin_token") || ""}` }
-    })
-      .then(res => res.json())
-      .then(data => setUsers(Array.isArray(data) ? data : []))
-      .catch(() => {
-        setUsers([
-          { id: "1", email: "admin@hospital.org", role: "admin", is_active: true },
-          { id: "2", email: "doctor@hospital.org", role: "doctor", is_active: true },
-          { id: "3", email: "nurse@hospital.org", role: "nurse", is_active: true },
-          { id: "4", email: "labtech@hospital.org", role: "lab tech", is_active: true },
-          { id: "5", email: "auditor@hospital.org", role: "auditor", is_active: true },
-        ]);
-      });
+    api.get("/api/v1/admin/users")
+      .then(res => setUsers(Array.isArray(res.data) ? res.data : []))
+      .catch(err => console.error("Error loading users:", err));
   }, []);
 
   return (
